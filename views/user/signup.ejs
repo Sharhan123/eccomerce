@@ -1,0 +1,77 @@
+<%- include('header.ejs') %>
+<div class="all container-fluid">
+  
+  <div class="frm">
+  <form action="/sign" method="post" class="form-m" >
+    <h2 class="cls">REGISTER</h2>
+    <div class="mb-3">
+      <label for="exampleInputEmail1" class="form-label eyth " >User name</label>
+      <input type="text" class="form-control name" id="exampleInputEmail1" aria-describedby="emailHelp " name="uname" onchange="check()" required>
+      
+    </div>
+    <div class="mb-3">
+      <label for="exampleInputEmail1" class="form-label eyth">Email address</label>
+      <input type="email" class="form-control email" id="exampleInputEmail1" aria-describedby="emailHelp" name="email" required onchange="check()">
+      <div id="emailHelp" class="form-text" style="color: white;">We'll never share your email with anyone else.</div>
+    </div>
+    <div class="mb-3">
+      <label for="exampleInputPassword1" class="form-label eyth">Password</label>
+      <input type="password" class="form-control" id="exampleInputPassword1" name="pswd" required>
+    </div>
+    <div class="mb-3">
+      <label for="exampleInputPassword1" class="form-label eyth">Confirm Password</label>
+      <input type="password" class="form-control" id="exampleInputPassword1" name="cpswd" required>
+    </div>
+  
+      
+<div class="algn" >
+  <p style="color:rgb(253, 0, 0); font-weight: 500;" id="eee"><%= error %></p>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+    <a href="" style="color: blue;">Already exist? Sign in</a>
+    </div>
+  </form>
+
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" crossorigin="anonymous"></script>
+
+<script>
+  var errorr = document.getElementById('eee');
+  
+
+  function check(){
+      let name = document.querySelector('.name').value;
+      if(!name.match(/^[a-zA-Z]*$/)){
+          errorr.innerHTML = "Special charecters and numbers not allowed";
+          return false;
+      }
+      if(name.length < 3){
+          errorr.innerHTML="Name Should have minimum 3 charecters.";
+          return false;
+      }
+      errorr.innerHTML = '<i class="fa-regular fa-circle-check" style="color:green;">'
+      return true;
+
+      let email = document.querySelector('.email').value
+      if(email.length < 1){
+          errorr.innerHTML = "Not meeting minimum charecters"
+          return false;
+      }
+      if(!email.match(/^[a-zA-Z0-9]+@/)){
+          errorr.innerHTML = "Not valid mail id"
+          return false;
+      }
+      errorr.innerHTML = '<i class="fa-regular fa-circle-check" style="color:green;">'
+      return true;
+  }
+
+
+  
+  
+
+</script>
+
+
+<%- include('footer.ejs') %>
