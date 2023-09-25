@@ -7,9 +7,9 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 
 
-const indexRouter = require('./routes/user');
+// const indexRouter = require('./routes/user');
 const adminRouter = require('./routes/adminroutes');
-
+const userRouter = require('./routes/userroutes');
 const app = express();
 
 // view engine setup
@@ -22,7 +22,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+
+app.use('/', userRouter);
+
 // app.use('/admin', usersRouter);
 app.use('/admin', adminRouter);
 mongoose.connect('mongodb://0.0.0.0:27017/projectdata').then(()=>console.log("connection successfull"));

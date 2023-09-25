@@ -2,22 +2,6 @@ var express = require("express");
 var router = express.Router();
 const auth= require('../middlewares/adminauth')
 const multer= require('../middlewares/multer');
-// const admincontroller={getadmin,
-//     postadmin,
-//     getdashboard,
-//     getproducts,
-//     addproduct,
-//     deleteproduct,
-//     getuser,
-//     deleteuser,
-//     blockuser,
-//     unblockuser,
-//     getcatagory,
-//     addcatagory,
-//     blockcatagory,
-//     unblockcatagory,
-//     deletecatagory,
-//     logout}=require("../controllers/admincontroller")
 const admincontroller = require("../controllers/admincontroller")
 
 router.get('/', admincontroller.getadmin)
