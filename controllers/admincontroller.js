@@ -8,7 +8,8 @@ const adata= require("../model/admin");
 const fs = require("fs");
 const path = require("path");
 const catagory = require("../model/catagory");
-
+const sharp= require("sharp")
+let uniqueIdentifier= Date.now();
 const getadmin= async function(req,res){
     res.render("admin/login",{error:""});
 }
@@ -28,7 +29,6 @@ const getdashboard=function(req, res){
 }
 
 const getproducts= async function(req, res){
-    uniqueIdentifier = Date.now();
     const product = await Product.find({});
     const catagry= await catagory.find({})
     res.render("admin/products", { product, pid: product._id ,catagory: catagry})
@@ -38,12 +38,13 @@ const getproducts= async function(req, res){
 const addproduct= async function(req, res){
     const uploadedImages = req.files;
     const imagePaths = [];
-  
+    
     try {
       for (const image of uploadedImages) {
         // Move the uploaded image to the "uploads" folder
         const imagePath = `/uploads/${image.originalname}`;
         imagePaths.push(imagePath);
+        
       }
   
       // Create a new product entry with the image paths
@@ -77,13 +78,13 @@ const deleteproduct= async function(req, res) {
 
     try {
       // Find the product by its ID
-      const product = await Product.findById(productId);
+      const product = await Product.findOne({_id:productId});
   
       // Retrieve the image paths associated with the product
       const imagePaths = product.Imagepath;
   
       // Delete the product from the database
-      await Product.findByIdAndRemove(productId);
+      await Product.findOneAndRemove({_id:productId});
   
       // Delete the associated image files from the "uploads" folder
       imagePaths.forEach((imagePath) => {
@@ -164,6 +165,64 @@ const deletecatagory= async function(req, res) {
 
 }
 
+const delproductimg= async function(req, res) {
+  const imagePath = req.params.imgSrc;
+  const productid = req.params.pid;
+  try {
+    await Product.findOneAndUpdate({_id:productid}, {
+      $pull: { Imagepath: imagePath },
+    });
+    const filePath = path.join(__dirname, "../public", imagePath);
+    fs.unlinkSync(filePath);
+  } catch (error) {
+    console.error("Error removing image path:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+
+
+
+
+
+
+const editproduct= async function(req, res) { 
+  console.log(req.body);
+  const uploadedImages = req.files;
+  console.log(uploadedImages);
+    const productId = req.params.productid;
+    const theproduct = await Product.findOne({_id:productId});
+    const imagePaths = theproduct.Imagepath;
+    for (const image of uploadedImages) {  
+      const imagePath = `/uploads/${image.originalname}`;
+      imagePaths.push(imagePath);
+    }
+    console.log(uploadedImages);
+
+    const editedData = { 
+      Description: req.body.desc,
+      Productname: req.body.pname,
+      Spec: req.body.specs,
+      Category: req.body.category,
+      Price: req.body.price, 
+      Discount: req.body.discount,
+      Shipingcost: req.body.scost,
+      Stoke: req.body.stoke,
+      Imagepath: imagePaths,
+    };
+
+    try {
+      await Product.findOneAndUpdate({_id:productId}, {
+        $set: editedData,
+      });
+      res.redirect("/admin/products");
+    } catch (err) {
+      console.log("Error on updating the data : " + err); 
+    }
+  
+}
+
+
 const logout= async function(req, res){
     res.clearCookie("admin");
   res.redirect("/admin/login");
@@ -185,5 +244,7 @@ module.exports = {
     blockcatagory,
     unblockcatagory,
     deletecatagory,
+    editproduct,
+    delproductimg,
     logout
 }

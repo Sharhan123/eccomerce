@@ -12,13 +12,14 @@ router.get('/dashboard',auth.islogin,admincontroller.getdashboard)
 router.get('/products',auth.islogin,admincontroller.getproducts)
 router.post('/addproduct',multer.upload.array("images", 8),admincontroller.addproduct)
 router.get('/deleteproduct/:pid',admincontroller.deleteproduct)
-
+router.post('/edit/:productid',admincontroller.editproduct) 
+router.get('/delproductimg/:imgSrc/:pid',admincontroller.delproductimg)
 
 router.get('/users',auth.islogin,admincontroller.getuser)
 router.get('/deleteuser/:uid',admincontroller.deleteuser)
 router.get('/blockuser/:email',admincontroller.blockuser)
 router.get('/unblockuser/:email',admincontroller.unblockuser)
-
+ 
  
 router.get('/cata',auth.islogin,admincontroller.getcatagory)
 router.post('/addcatagory',admincontroller.addcatagory)

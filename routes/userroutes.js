@@ -17,7 +17,7 @@ router.post('/resendVerification/:email',usercontroller.postresendverification)
 
 
 router.get('/sin',usercontroller.getlogin)
-router.post('/login',usercontroller.postlogin)
+router.post('/login',usercontroller.postlogin) 
 router.get('/logout',usercontroller.getlogout)
 
 
@@ -29,4 +29,11 @@ router.post('/secondaryaddress',usercontroller.postsecondaryaddress)
 router.post('/editprofile',usercontroller.editprofile)
 
 
-module.exports = router;
+router.get('/productdetials/:pid',usercontroller.getproductdetials)
+
+
+router.get('/addtocarthome/:pid',usercontroller.addtocarthome)
+router.get('/viewcart',usercontroller.getCart)
+router.put('/updateQuantity/:id',usercontroller.updatecart)
+router.get('/removefromcartcart/:pid',usercontroller.removecart)
+module.exports = router; 
