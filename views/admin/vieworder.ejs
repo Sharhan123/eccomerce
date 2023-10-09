@@ -1,0 +1,89 @@
+<%- include('head.ejs') %>
+
+    <div class="container">
+        <% if(order){ %>
+            <!-- Product listing -->
+            <div class="row ">
+                <div class="col-12 mt-4" style="display: flex; justify-content: space-between;">
+                    <h5><a href="/admin/orders" style="text-decoration: none; color: #000;"><button style="background-color: red; color: white;">Back to Orders</button> </a></h5>
+                    <!-- <h5 style="color: slategray;">On: <%= order.Orderdate.toDateString() %> -->
+                    </h5>
+                </div>
+                <div class="allProducts row col-12 mt-1">
+                    <% order.Items.map((item)=>{ %>
+                        <div class="gcard2 col-12 col-lg-12 mb-2">
+                            <div class="shadow" style="width: 100%; display: flex; padding: 10px 20px; border-radius: 10px; justify-content: space-between;">
+                                
+                                <div class="gcard2-body p-3">
+                                    <h6>
+                                        <%= item.Productname %>
+                                    </h6>
+                                    <span>Quantity: <%= item.Quantity %></span><br>
+                                    <span>Price: ₹<%= item.Price %></span><br>
+                                    <span>Shipping cost: ₹<%= order.Shippingcost %></span><br>
+                                    <span>Total: ₹<%= item.Price + order.Shippingcost %></span>
+                                </div>
+                                <div class=""> 
+                                    <a  onclick="removeOrderItem('<%= item._id %>', '<%= order._id %>')"><button  style="background-color: rgb(163, 8, 8); color: white; outline: auto ">Cancel item</button></a>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <% }) %>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mt-4" style="display: flex; justify-content: space-between;">
+                    <h5 style="color: rgb(2, 29, 182);"><i class="fa-solid fa-angle-down"></i> Order details</h5>
+                    <!-- <h5 style="color: slategray;">Arriving: <%= order.Orderdate.toDateString() %></h5> -->
+                </div>
+
+
+               
+                
+                    <div class="col-12 col-lg-6">
+                        <h6 style="color: rgb(194, 16, 16);">Expected delivery: <span style="color: rgb(0, 0, 0);">
+                                <% let edate=new Date(order.Orderdate); edate.setDate(edate.getDate()+3) %>
+                                    <%= edate.toDateString() %>
+                            </span></h6>
+                        <h6 style="color: rgb(194, 16, 16);">Delivery Status: <span style="color: rgb(0, 0, 0);">
+                                <%= order.Status %>
+                            </span></h6>
+                        <h6 style="color: rgb(194, 16, 16);">Items count: <span style="color: rgb(0, 0, 0);">
+                                <%= order.Items.length %>
+                            </span></h6>
+                        <h6 style="color: rgb(194, 16, 16);">Total amount: <span style="color: rgb(0, 0, 0);">₹<%=
+                                    order.Totalamount %></span></h6>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+    </div>
+
+
+
+    <script>
+        async function removeOrderItem(productId, orderId) {
+            // AJAX request to update the quantity
+            const prompt = confirm('Are you sure you want to cancel the order?');
+            if (prompt) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/removeorderitem/' + productId + '/' + orderId,
+                    success: function (response) {
+                        console.log('Order Item Removed successfully:', response);
+                        // Update the total price and any other UI elements as needed
+                        // For simplicity, let's reload the page to update the UI after quantity change
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('Error removing order item:', error);
+                        location.reload();
+                    }
+                });
+            }
+    
+        }
+    </script>
+
+    <%- include('foot.ejs') %>

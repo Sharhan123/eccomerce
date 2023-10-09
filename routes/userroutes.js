@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 const usercontroller=require('../controllers/usercontroller')
 const auth= require('../middlewares/userauth')
+const clear = require('../middlewares/header')
 require('dotenv').config()
 
-router.get('/',usercontroller.gethome)
+router.get('/',clear.clearheader,usercontroller.gethome)
 
 
-router.get('/register',usercontroller.getsignup)
+router.get('/register',clear.clearheader,usercontroller.getsignup)
 router.post('/sign',usercontroller.postsignup)
 
 
@@ -36,4 +37,17 @@ router.get('/addtocarthome/:pid',usercontroller.addtocarthome)
 router.get('/viewcart',usercontroller.getCart)
 router.put('/updateQuantity/:id',usercontroller.updatecart)
 router.get('/removefromcartcart/:pid',usercontroller.removecart)
+router.get('/removeorderitem/:id/:oid', usercontroller.removeorder);
+
+router.get('/checkout',usercontroller.checkout)
+router.get("/checkoutitem/:pid", (req, res) => {
+    res.redirect(`/checkout?pid=${req.params.pid}`);
+  });
+
+  router.get('/cartcheckout' ,auth.islogin,usercontroller.cartcheckout)
+  router.post('/saveorder',usercontroller.saveorder)
+  router.get('/placeorder',auth.islogin,usercontroller.placeorder)
+
+
+  router.get('/shop',clear.clearheader,usercontroller.getshop)
 module.exports = router; 

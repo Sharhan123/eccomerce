@@ -5,7 +5,7 @@
                 <input type="search" placeholder="Search for products by name or category" id="productSearch">
                 <i class="las la-search"></i>
             </div>
-            <button class="btn btn-success" id="openAddProduct">Add Catagory</button>
+            <button class="btn btn-success" id="openAddProduct">Add Banner</button>
             
         </div>
     
@@ -15,18 +15,21 @@
                 <tr>
                     <th scope="col">#</th>
                     <!-- <th scope="col">Profile</th> -->
-                    <th scope="col">Catagory</th>
+                    <th scope="col">Matter</th>
                     <th scope="col">Image</th>
                     <!-- <th scope="col">Phone</th> -->
-                    <th scope="col">Actions</th>
+                    <th scope="col">Category</th>
                    
                     <!-- <th scope="col">edit</th> -->
                     <th scope="col">delete</th>
                     
                 </tr>
             </thead>
+            <% if(error) { %>
+                <h4>error</h4>
+                <% }else { %>
             <tbody>
-                <% users.map((user, index)=> { %>
+                <% banners.map((baner, index)=> { %>
                     <tr class="product-row">
                         <th scope="row">
                             <%= index + 1 %>
@@ -34,51 +37,49 @@
                         <!-- <td><img src="/assets/images/icons/logo.png"
                                 style="width: 40px;height: 40px;object-fit: cover;border-radius: 10px;"></td> -->
                         <td class="user-name">
-                            <%= user.catagory %>
+                            <%= baner.matter %>
                         </td>
 
                         <td>
-                            <img src="<%= user.ImagePath[0] %>"
+                            <img src="<%= baner.ImagePath[0] %>"
                                     style="width: 40px;height: 40px;object-fit: cover;border-radius: 10px;">
                         </td>
 
+                       
                         <td>
-                            <% if(user.Blocked){ %>
-                                <a href="/admin/unblock/<%= user.catagory %>"
-                                    class="btn btn-dark delete-button" style="width: 80px;"
-                                    onclick="return confirm('Are you sure you want to Unblock this user?')">UnBlock</a>
-                                <% } else { %>
-                                    <a href="/admin//block/<%= user.catagory %>"
-                                        class="btn btn-success delete-button" style="width: 80px;"
-                                        onclick="return confirm('Are you sure you want to block this user?')">Block</a>
-                                    <% } %>
+                            <%= baner.catagory %>
                         </td>
-                        <!-- <td>
-                            <button class="btn btn-primary openEditBtn" style="width: 80px;" onclick="">Edit</button>
-                        </td> -->
                         <td>
-                            <a href="/admin/delete/<%= user.catagory %>" class="btn btn-danger delete-button"
+                            <a href="/admin/deletebanner/<%= baner._id %>" class="btn btn-danger delete-button"
                                 onclick="return confirm('Are you sure you want to delete this catagory?')">Delete</a>
                         </td>
                         
                     </tr>
                     <% }); %>
             </tbody>
+            <% } %>
         </table>
     </div>
     <div class="popUp" style="display: none;">
         <div><button class="btn btn-danger closeBtn">close</button></div>
         <div class="formDiv">
-            <h6 class="text-center">Add New Catagory</h6>
-            <form action="/admin/addcatagory" method="post" enctype="multipart/form-data">
+            <h6 class="text-center">Add New Banner</h6>
+            <form action="/admin/addbanner" method="post" enctype="multipart/form-data">
                 <div class="mb-3">
-                    <label class="form-label">Catagory</label>
-                    <input type="text" class="form-control" id="fileUpload" name="catagory" required>
+                    <label class="form-label">Matter</label>
+                    <input type="text" class="form-control" id="fileUpload" name="matter" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select class="form-label form-control" name="catagory">
+                        <% ctgry.map((category, index)=> { %>
+                            <option value="<%= category.catagory %>" class=""><%= category.catagory %></option>
+                        <% }); %>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Select the images</label>
-                    <p style="color: red;"> Add only one image</p>
-                    <input type="file" class="form-control" id="fileUpload" name="images" value="" multiple required>
+                    <input type="file" class="form-control" id="fileUpload" name="images" value="" multiple>
                 </div>
                 <div id="imagePreview"></div>
                 <button type="submit" class="btn btn-primary">Add Catagory</button>

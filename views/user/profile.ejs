@@ -54,6 +54,11 @@
                                 <% if(!cookies){ %>
                                     <a href="/sin" ><h6 style="color: orangered;"><u>Login to view your profile</u></h6></a>
                                 <% } else { %>
+                                    <% if(error) { %>
+                                    <h6 style="color: red;"><%= error%></h6>
+                                    <% } else { %>
+                                        <h6></h6>
+                                        <% } %>
                                 <div class="tab-pane fade show active" id="tab-dashboard" role="tabpanel"
                                     aria-labelledby="tab-dashboard-link">
                                     <p>Hello <span class="font-weight-normal text-dark"><%= cookies.name %></span> (not <span
@@ -67,12 +72,64 @@
                                     </p>
                                 </div><!-- .End .tab-pane -->
                                 <% } %>
-                                <div class="tab-pane fade" id="tab-orders" role="tabpanel"
-                                    aria-labelledby="tab-orders-link">
-                                    <p>No order has been made yet.</p>
-                                    <a href="category.html" class="btn btn-outline-primary-2"><span>GO SHOP</span><i
-                                            class="icon-long-arrow-right"></i></a>
-                                </div><!-- .End .tab-pane -->
+
+
+
+
+
+                                                                                        <div class="tab-pane fade" id="tab-orders" role="tabpanel"
+                                                            aria-labelledby="tab-orders-link">
+                                                            <% if(orders){ %>
+                                                                <div>
+                                                                    <% orders.map((order)=>{ %>
+                                                                        <div class="row mb-2"
+                                                                            style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px;">
+                                                                            <span class="col-6" style="color: blue;">
+                                                                                <%= order.Orderdate.toDateString() %>
+                                                                            </span>
+                                                                            <span class="col-6"
+                                                                                style="text-align: right; color: green;">Arriving: <%
+                                                                                    let edate=new Date(order.Orderdate);
+                                                                                    edate.setDate(edate.getDate()+3) %>
+                                                                                    <%= edate.toDateString() %></span>
+                                                                            <% order.Items.map((item)=>{ %>
+                                                                                <% const odate=item.Orderdate %>
+                                                                                    <div class="col-12">
+                                                                                        <div class="gcard mb-1">
+                                                                                            <a href="/vieworder?id=<%= order._id %>"><img
+                                                                                                    src="<%= item.Productimg %>"
+                                                                                                    alt=""></a>
+                                                                                            <div class="gcard-body">
+                                                                                                <h6>
+                                                                                                    <a href="/vieworder?id=<%= order._id %>">
+                                                                                                        <%= item.Productname %>
+                                                                                                    </a>
+
+                                                                                                </h6>
+                                                                                                <div
+                                                                                                    style="display: flex;justify-content: space-between;">
+                                                                                                    <p>Quantity: <%= item.Quantity  %> <br>
+                                                                                                            Amount: $<%= item.Quantity*item.Price %>
+                                                                                                    </p>
+                                                                                                    <a onclick="removeOrderItem('<%= item._id %>', '<%= order._id %>')"
+                                                                                                        class="btn btn-danger" style="color: white;" >cancel
+                                                                                                        item</a>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                    <% }) %>
+                                                                        </div>
+                                                                        <% }) %>
+                                                                </div>
+                                                                <% }else{ %>
+                                                                    <h6>There is no orders yet !</h6>
+                                                                    <% } %>
+                                                        </div><!-- .End .tab-pane -->
+
+
+
 
                                 <div class="tab-pane fade" id="tab-downloads" role="tabpanel"
                                     aria-labelledby="tab-downloads-link">
@@ -103,6 +160,11 @@
                                                                 aria-labelledby="signin-tab">
                                                                 <form action="/primaryaddress" method="post">
                                                                     <div class="mb-3">
+                                                                        <label class="form-label">Name</label>
+                                                                        <input type="text" class="form-control" name="name" value="<%= address?address.PrimaryAddress.Name:'' %>">
+                                                                      </div>
+
+                                                                    <div class="mb-3">
                                                                       <label class="form-label">Country</label>
                                                                       <input type="text" class="form-control" name="country" value="<%= address?address.PrimaryAddress.Country:'' %>">
                                                                     </div>
@@ -122,6 +184,12 @@
                                                                       <label class="form-label">pincode</label>
                                                                       <input type="text" class="form-control" name="pincode" value="<%= address?address.PrimaryAddress.Pincode:'' %>">
                                                                     </div>
+
+                                                                    <div class="mb-3">
+                                                                      <label class="form-label">Phone</label>
+                                                                      <input type="text" class="form-control" name="phone" value="<%= address?address.PrimaryAddress.Phone:'' %>">
+                                                                    </div>
+
                                                                     <button type="submit" class="btn btn-primary">Save it</button>
                                                                   </form>
                                                                 
@@ -145,13 +213,13 @@
                                                 <div class="card-body">
                                                     <h3 class="card-title">Primary Address</h3><!-- End .card-title -->
                                                     <% if(address){ %>
-                                                    <p><%= cookies.name %><br>
-                                                        <%= address.PrimaryAddress.States %>, 
-                                                        <%= address.PrimaryAddress.City %><br>
+                                                    <%= address.PrimaryAddress.Name %><br>
+                                                    <%= address.PrimaryAddress.City %>,
+                                                    <%= address.PrimaryAddress.States %><br> 
                                                         <%= address.PrimaryAddress.Landmark %><br>
                                                         <%= address.PrimaryAddress.Country %><br>
                                                         <%= address.PrimaryAddress.Pincode %><br>
-                                                        Email : <%= cookies.email %> <br>
+                                                        <%= address.PrimaryAddress.Phone %> <br>
                                                         <% } else { %>
                                                             You have not set up this type of address yet.
                                                         <% } %>
@@ -175,7 +243,7 @@
                                                             <div class="form-tab">
                                                                 <ul class="nav nav-pills nav-fill" role="tablist">
                                                                     <li class="nav-item">
-                                                                        <a class="nav-link active" id="signin-tab" data-toggle="tab" href="#signin"
+                                                                        <a class="nav-link active" id="signin-tab" data-toggle="tab" href="/sin"
                                                                             role="tab" aria-controls="signin" aria-selected="true">Secondary Address</a>
                                                                     </li>
                                                                 </ul>
@@ -183,6 +251,11 @@
                                                                     <div class="tab-pane fade show active" id="signin" role="tabpanel"
                                                                         aria-labelledby="signin-tab">
                                                                         <form action="/secondaryaddress" method="post">
+                                                                            <div class="mb-3">
+                                                                                <label class="form-label">Name</label>
+                                                                                <input type="text" class="form-control" name="name" value="<%= address?address.PrimaryAddress.Name:'' %>">
+                                                                              </div>
+
                                                                             <div class="mb-3">
                                                                               <label class="form-label">Country</label>
                                                                               <input type="text" class="form-control" name="country" value="<%= address?address.SecondaryAddress.Country:'' %>">
@@ -203,6 +276,11 @@
                                                                               <label class="form-label">pincode</label>
                                                                               <input type="text" class="form-control" name="pincode" value="<%= address?address.SecondaryAddress.Pincode:'' %>"> 
                                                                             </div>
+                                                                            <div class="mb-3">
+                                                                                <label class="form-label">Phone</label>
+                                                                                <input type="text" class="form-control" name="phone" value="<%= address?address.PrimaryAddress.Phone:'' %>">
+                                                                              </div>
+
                                                                             <button type="submit" class="btn btn-primary">Save it</button>
                                                                           </form>
                                                                         
@@ -222,11 +300,14 @@
                                                     <h3 class="card-title">Secondary Address</h3><!-- End .card-title -->
                                                     <% if(address){ %>
                                                         <p>
+                                                            <%= address.SecondaryAddress.Name %>
                                                             <%= address.SecondaryAddress.City %>, 
                                                             <%= address.SecondaryAddress.States %><br>
                                                             <%= address.SecondaryAddress.Landmark %><br>
                                                             <%= address.SecondaryAddress.Country %><br>
                                                             <%= address.SecondaryAddress.Pincode %><br>
+                                                            <%= address.SecondaryAddress.Phone %><br>
+
                                                             <% } else { %>
                                                                 You have not set up this type of address yet.
                                                             <% } %>
@@ -493,5 +574,30 @@
 <!-- Main JS File -->
 <script src="assets/js/main.js"></script>
 
+
+
+<script>
+    async function removeOrderItem(productId, orderId) {
+        // AJAX request to update the quantity
+        const prompt = confirm('Are you sure you want to cancel the order?');
+        if (prompt) {
+            $.ajax({
+                type: 'GET',
+                url: '/removeorderitem/' + productId + '/' + orderId,
+                success: function (response) {
+                    console.log('Order Item Removed successfully:', response);
+                    // Update the total price and any other UI elements as needed
+                    // For simplicity, let's reload the page to update the UI after quantity change
+                    location.reload();
+                },
+                error: function (error) {
+                    console.error('Error removing order item:', error);
+                    location.reload();
+                }
+            });
+        }
+
+    }
+</script>
 
 <%- include('footer.ejs') %>

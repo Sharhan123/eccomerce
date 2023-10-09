@@ -1,8 +1,8 @@
 const mongoose=require('mongoose')
 
-const cschema= new mongoose.Schema(
+const bschema= new mongoose.Schema(
     {
-        catagory:{
+        matter:{
             type:String,
             required:true
         },
@@ -10,10 +10,10 @@ const cschema= new mongoose.Schema(
             type:Array,
             required:true
         },
-        Blocked:{
-            type:Boolean,
+        catagory:{
+            type:String,
             required:true
         }
 })
 
-module.exports=mongoose.model('catagory',cschema);
+module.exports=mongoose.model('banner',bschema);

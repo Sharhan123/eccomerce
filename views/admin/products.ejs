@@ -125,47 +125,55 @@
         <div class="formDiv">
             <h6 class="text-center">Edit the product  </h6>
             
-            <form  onsubmit="editproduct()" method="post" id="theEditForm" enctype="multipart/form-data">
+            <form  method="post" onsubmit="editproduct()"  id="theEditForm" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label">Product Name</label>
-                    <input type="text" class="form-control" name="pname" id="pname">
+                    <input type="text" class="form-control" name="pname" id="pname" value="">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Category</label>
-                    <input type="text" class="form-control" name="category" id="category">
+                    <input type="text" class="form-control" name="category" id="category" value="">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Specs</label>
-                    <input type="text" class="form-control" name="specs" id="specs">
+                    <input type="text" class="form-control" name="specs" id="specs" value="">
                 </div>
                 <div class="form-floating mb-3">
-                    <textarea class="form-control" name="desc" placeholder="Leave a comment here" id="desc"></textarea>
+                    <textarea class="form-control" name="desc" placeholder="Leave a comment here" id="desc" ></textarea>
                     <label for="desc">Description</label>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Price</label>
-                    <input type="number" name="price" id="price" class="form-control">
+                    <input type="number" name="price" id="price" class="form-control" value="">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Shipping cost</label>
-                    <input type="number" name="scost" id="scost" class="form-control">
+                    <input type="number" name="scost" id="scost" class="form-control" value="">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Discount amount</label>
-                    <input type="number" name="discount" id="discount" class="form-control">
+                    <input type="number" name="discount" id="discount" class="form-control" value="">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Total stoke</label>
-                    <input type="number" name="stoke" id="stoke" class="form-control">
+                    <input type="number" name="stoke" id="stoke" class="form-control " value="">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Select the images</label>
-                    <input type="file" class="form-control" id="editfileUpload" name="images" multiple>
+                    <input type="file" class="form-control" id="editfileUpload" name="images" value="" multiple>
                 </div>
-                <h6>images</h6>
                 <div id="editImagePreview"></div>
                 <button type="submit" class="btn btn-primary">Edit product</button>
-</form>
+            </form>
+
+
+
+
+
+
+
+
+            
         </div> 
     </div>
 
@@ -269,6 +277,8 @@
         }
 
     </script>
+
+    
     <script>
         const fileInput2 = document.getElementById('editfileUpload');
         const imagePreview2 = document.getElementById('editImagePreview');

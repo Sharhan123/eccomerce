@@ -44,62 +44,9 @@
                                 
                             </li>
                             <li>
-                                <a href="category.html" class="sf-with-ul">Shop</a>
+                                <a href="/shop" >Shop</a>
 
-                                <div class="megamenu megamenu-md">
-                                    <div class="row no-gutters">
-                                        <div class="col-md-8">
-                                            <div class="menu-col">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="menu-title">Shop with sidebar</div><!-- End .menu-title -->
-                                                        <ul>
-                                                            <li><a href="category-list.html">Shop List</a></li>
-                                                            <li><a href="category-2cols.html">Shop Grid 2 Columns</a></li>
-                                                            <li><a href="category.html">Shop Grid 3 Columns</a></li>
-                                                            <li><a href="category-4cols.html">Shop Grid 4 Columns</a></li>
-                                                            <li><a href="category-market.html"><span>Shop Market<span class="tip tip-new">New</span></span></a></li>
-                                                        </ul>
-
-                                                        <div class="menu-title">Shop no sidebar</div><!-- End .menu-title -->
-                                                        <ul>
-                                                            <li><a href="category-boxed.html"><span>Shop Boxed No Sidebar<span class="tip tip-hot">Hot</span></span></a></li>
-                                                            <li><a href="category-fullwidth.html">Shop Fullwidth No Sidebar</a></li>
-                                                        </ul>
-                                                    </div><!-- End .col-md-6 -->
-
-                                                    <div class="col-md-6">
-                                                        <div class="menu-title">Product Category</div><!-- End .menu-title -->
-                                                        <ul>
-                                                            <li><a href="product-category-boxed.html">Product Category Boxed</a></li>
-                                                            <li><a href="product-category-fullwidth.html"><span>Product Category Fullwidth<span class="tip tip-new">New</span></span></a></li>
-                                                        </ul>
-                                                        <div class="menu-title">Shop Pages</div><!-- End .menu-title -->
-                                                        <ul>
-                                                            <li><a href="cart.html">Cart</a></li>
-                                                            <li><a href="checkout.html">Checkout</a></li>
-                                                            <li><a href="wishlist.ht+l">Wishlist</a></li>
-                                                            <li><a href="dashboard.html">My Account</a></li>
-                                                            <li><a href="#">Lookbook</a></li>
-                                                        </ul>
-                                                    </div><!-- End .col-md-6 -->
-                                                </div><!-- End .row -->
-                                            </div><!-- End .menu-col -->
-                                        </div><!-- End .col-md-8 -->
-
-                                        <div class="col-md-4">
-                                            <div class="banner banner-overlay">
-                                                <a href="category.html" class="banner banner-menu">
-                                                    <img src="assets/images/menu/banner-1.jpg" alt="Banner">
-
-                                                    <div class="banner-content banner-content-top">
-                                                        <div class="banner-title text-white">Last <br>Chance<br><span><strong>Sale</strong></span></div><!-- End .banner-title -->
-                                                    </div><!-- End .banner-content -->
-                                                </a>
-                                            </div><!-- End .banner banner-overlay -->
-                                        </div><!-- End .col-md-4 -->
-                                    </div><!-- End .row -->
-                                </div><!-- End .megamenu megamenu-md -->
+                                <!-- End .megamenu megamenu-md -->
                             </li>
                             <li>
                                 <li>
@@ -314,56 +261,22 @@
         <div class="container categories pt-6">
             <h2 class="title-lg text-center mb-4">Shop by Categories</h2><!-- End .title-lg text-center -->
 
-            <div class="row">
-                <div class="col-6 col-lg-4">
-                    <div class="banner banner-display banner-link-anim">
-                        <a href="#">
-                            <img src="assets/images/banners/home/banner-1.jpg" alt="Banner">
+            <div class="row" >
+                <% for(i=0;i<cata.length;i++) { %>
+
+                <div class="col-6   col-lg-4"  >
+                    <div class=" banner-display banner-link-anim"  style="max-width: 500px; object-fit: contain ;">
+                        <a href="#" >
+                            <img src="<%= cata[i].ImagePath[0] %>" alt="Banner" style="height:unset;">
                         </a>
 
                         <div class="banner-content banner-content-center">
-                            <h3 class="banner-title text-white"><a href="#">Outdoor</a></h3><!-- End .banner-title -->
-                            <a href="#" class="btn btn-outline-white banner-link">Shop Now<i class="icon-long-arrow-right"></i></a>
+                            <h3 class="banner-title text-white"><a href="#"><%= cata[i].catagory %></a></h3><!-- End .banner-title -->
+                            <a href="/shop/?name=<%= cata[i].catagory %>" class="btn btn-outline-white banner-link">Shop Now<i class="icon-long-arrow-right"></i></a>
                         </div><!-- End .banner-content -->
                     </div><!-- End .banner -->
                 </div><!-- End .col-sm-6 col-lg-3 -->
-                <div class="col-6 col-lg-4 order-lg-last">
-                    <div class="banner banner-display banner-link-anim">
-                        <a href="#">
-                            <img src="assets/images/banners/home/banner-4.jpg" alt="Banner">
-                        </a>
-
-                        <div class="banner-content banner-content-center">
-                            <h3 class="banner-title text-white"><a href="#">Lighting</a></h3><!-- End .banner-title -->
-                            <a href="#" class="btn btn-outline-white banner-link">Shop Now<i class="icon-long-arrow-right"></i></a>
-                        </div><!-- End .banner-content -->
-                    </div><!-- End .banner -->
-                </div><!-- End .col-sm-6 col-lg-3 -->
-                <div class="col-sm-12 col-lg-4 banners-sm">
-                    <div class="row">
-                        <div class="banner banner-display banner-link-anim col-lg-12 col-6">
-                            <a href="#">
-                                <img src="assets/images/banners/home/banner-2.jpg" alt="Banner">
-                            </a>
-
-                            <div class="banner-content banner-content-center">
-                                <h3 class="banner-title text-white"><a href="#">Furniture and Design</a></h3><!-- End .banner-title -->
-                                <a href="#" class="btn btn-outline-white banner-link">Shop Now<i class="icon-long-arrow-right"></i></a>
-                            </div><!-- End .banner-content -->
-                        </div><!-- End .banner -->
-
-                        <div class="banner banner-display banner-link-anim col-lg-12 col-6">
-                            <a href="#">
-                                <img src="assets/images/banners/home/banner-3.jpg" alt="Banner">
-                            </a>
-
-                            <div class="banner-content banner-content-center">
-                                <h3 class="banner-title text-white"><a href="#">Kitchen & Utensil</a></h3><!-- End .banner-title -->
-                                <a href="#" class="btn btn-outline-white banner-link">Shop Now<i class="icon-long-arrow-right"></i></a>
-                            </div><!-- End .banner-content -->
-                        </div><!-- End .banner -->
-                    </div>
-                </div><!-- End .col-sm-6 col-lg-3 -->
+                <% } %>
             </div><!-- End .row -->
         </div><!-- End .container -->
 
@@ -424,12 +337,11 @@
                                     <div class="product-body">
                                         <h3 class="product-title"><a href="/productdetials/<%= product[i]._id %>"><%= product[i].Productname%></a></h3><!-- End .product-title -->
                                         <div class="product-price">
-                                            $<%= product[i].Price%>
+                                            ₹ <%= product[i].Price-product[i].Discount%>
                                         </div><!-- End .product-price -->
 
-                                        <div class="product-nav product-nav-dots">
-                                            <a href="#" class="active" style="background: #333333;"><span class="sr-only">Color name</span></a>
-                                            <a href="#" style="background: #e8e8e8;"><span class="sr-only">Color name</span></a>
+                                        <div class="product-nav product-nav-dots" style="color: rgb(198, 25, 6); text-decoration: line-through;">
+                                           <p>Original price :</p>₹ <%= product[i].Price %>
                                         </div><!-- End .product-nav -->
                                     </div><!-- End .product-body -->
                                     <div class="product-action">

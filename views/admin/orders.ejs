@@ -1,0 +1,117 @@
+
+
+
+
+
+<%- include('head.ejs') %>
+
+    <div class="product-wrapper">
+        <div class="productsNav mt-3 mb-5">
+           
+            <div class="searchBar">
+                <input type="search" placeholder="Search for products by name or category" id="productSearch">
+                <i class="las la-search"></i>
+            </div>
+        </div>
+        <div class="div tableWrapper">
+            <table class="table table-light">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">User name</th>
+                        
+                        <th scope="col">Item quantity</th>
+                        
+                        <th scope="col">Amount</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Details</th>
+                        <th scope="col"> Cancel item</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <% order.map((order, index)=> { %>
+                        
+                        <tr class="product-row">
+                            <th scope="row">
+                                <%= index + 1 %>
+                            </th>
+                            <td class="product-name">
+                                <%= order.Username %>
+                            </td>
+                            
+                            <td>
+                                <%=order.Items.length  %>
+                            </td>
+                            <td>
+                                ₹<%= order.Totalamount %>
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <%= order.Status %>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                      <li><a class="dropdown-item" href="/admin/changeorderstatus/<%= order._id %>/active">Active</a></li>
+                                      <li><a class="dropdown-item" href="/admin/changeorderstatus/<%= order._id %>/shipped">Shipped</a></li>
+                                      <li><a class="dropdown-item" href="/admin/changeorderstatus/<%= order._id %>/delivered">Delivered</a></li>
+                                    </ul>
+                                  </div>
+                            </td>
+                            
+                            <td>
+                                <a href="/admin/vieworder?oid=<%= order._id %>" class="btn btn-primary">view details</a>
+                            </td>
+
+                            <td>
+                                <a href="/admin/deleteorder/<%= order._id %>" class="btn btn-danger"
+                                    onclick="return confirm('Are you sure you want to cancel the order?')">cancel order</a>                            </td>
+                            
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- ADD PRODUCT FORM... -->
+
+    <!-- EDIT PRODUCT FORM -->
+    <!-- EDIT PRODUCT FORM -->
+   
+
+    
+    <!-- SEARCHING SCRIPT -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // Select the search input field
+            const productSearchInput = document.getElementById('productSearch');
+
+            // Select all product rows
+            const productRows = document.querySelectorAll('.product-row');
+
+            productSearchInput.addEventListener('input', () => {
+                const searchTerm = productSearchInput.value.toLowerCase();
+
+                // Loop through all product rows and hide those that don't match the search term
+                productRows.forEach((row) => {
+                    const productName = row.querySelector('.product-name').textContent.toLowerCase();
+                    const productCategory = row.querySelector('.product-category').textContent.toLowerCase();
+
+                    if (
+                        productName.includes(searchTerm) ||
+                        productCategory.includes(searchTerm)
+                    ) {
+                        row.style.display = 'table-row';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+
+        })
+    </script>
+
+    <%- include('foot.ejs') %>
+
+

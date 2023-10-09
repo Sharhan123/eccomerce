@@ -8,8 +8,15 @@ const adata= require("../model/admin");
 const fs = require("fs");
 const path = require("path");
 const catagory = require("../model/catagory");
-const sharp= require("sharp")
+
 let uniqueIdentifier= Date.now();
+const order= require("../model/orders");
+const Orders = require("../model/orders");
+const Banner = require("../model/banner");
+
+
+
+
 const getadmin= async function(req,res){
     res.render("admin/login",{error:""});
 }
@@ -134,12 +141,39 @@ const getcatagory= async function(req, res){
 }
 
 const addcatagory= async function(req, res){
+
+  const input= req.body.catagory;
+
+  const regexPattern = new RegExp(input, 'i');
+
+  const existingCategory = await catagory.findOne({ catagory: { $regex: regexPattern } });
+
+  if(existingCategory){
+    res.redirect('/admin/cata')
+  }else{
+
+  
+
+  const uploadedImages = req.files;
+  const imagePaths = [];
+  
+  
+    for (const image of uploadedImages) {
+      // Move the uploaded image to the "uploads" folder
+      const imagePath = `/uploads/${image.originalname}`;
+      imagePaths.push(imagePath);
+      
+    }
+
+    
     const newcat= new catagory({
         catagory:req.body.catagory,
+        ImagePath:imagePaths,
         Blocked:false
         })
         await newcat.save()
         res.redirect('/admin/cata')
+      }
 }
 
 const blockcatagory= async function(req, res){
@@ -228,6 +262,92 @@ const logout= async function(req, res){
   res.redirect("/admin/login");
 }
 
+const getorder= async function(req, res, next){
+
+  const order= await Orders.find({})
+  if(order){
+
+    res.render('admin/orders' ,{order})
+  }else{
+    res.render('admin/orders',{error:"Order not found"})
+  }
+}
+
+
+const getbanner = async function(req, res, next){
+  const banners = await Banner.find({})
+  const ctgry = await catagory.find({})
+
+  if(banners){
+    res.render('admin/banner',{banners,ctgry,error:""})
+  }else{
+    res.render('admin/banner',{error:"No banner found"})
+  }
+} 
+
+
+const addbanner = async function(req, res, next){
+  
+
+  const uploadedImages = req.files;
+  const imagePaths = [];
+  
+  
+    for (const image of uploadedImages) {
+      // Move the uploaded image to the "uploads" folder
+      const imagePath = `/uploads/${image.originalname}`;
+      imagePaths.push(imagePath);
+      
+    }
+    const newcat= new Banner({
+      matter:req.body.matter,
+      ImagePath:imagePaths,
+      catagory:req.body.catagory
+      })
+      await newcat.save()
+      res.redirect('/admin/banner')
+
+
+}
+
+
+const deletebanner = async function(req, res) {
+  try {
+    const id= req.params.id
+    
+    await Banner.findByIdAndRemove(id);
+    res.redirect("/admin/banner"); 
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
+
+const changeorder =async (req, res, next) => {
+  await Orders.findByIdAndUpdate(req.params.orderid, { $set: {Status: req.params.status} })
+  res.redirect('/admin/orders')
+}
+
+
+
+const vieworder= async (req, res, next) => {
+  try {
+    const order = await Orders.findById(req.query.oid);
+    res.render("admin/vieworder", { order: order });
+  } catch (error) {
+    res.status(400).json({ message: "Order not found" });
+  }
+}
+
+
+const deleteorder= async function (req, res) {
+  await Orders.findByIdAndDelete(req.params.orderid)
+  res.redirect('/admin/orders')
+
+}
+
+
 module.exports = {
     getadmin,
     postadmin,
@@ -246,5 +366,12 @@ module.exports = {
     deletecatagory,
     editproduct,
     delproductimg,
-    logout
-}
+    logout,
+    getorder,
+    getbanner,
+    addbanner,
+    deletebanner,
+    changeorder,
+    vieworder,
+    deleteorder
+  }
