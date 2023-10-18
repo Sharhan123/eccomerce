@@ -115,10 +115,11 @@
                 <div class="header-right">
                     <div class="header-search">
                         <a href="#" class="search-toggle" role="button" title="Search"><i class="icon-search"></i></a>
-                        <form action="#" method="get">
+                        <form action="/shop" method="get">
                             <div class="header-search-wrapper">
-                                <label for="q" class="sr-only">Search</label>
-                                <input type="search" class="form-control" name="q" id="Productsearch" placeholder="Search in..." required>
+                                <label for="search" class="sr-only">Search</label>
+                                <input type="search" class="form-control" name="search" id="Productsearch" placeholder="Search in..." required>
+                                <button type="submit" class="btn btn-primary"><i class="icon-search"></i></button>
                             </div><!-- End .header-search-wrapper -->
                         </form>
                     </div><!-- End .header-search -->
@@ -151,23 +152,25 @@
 
 
     <main class="main">
-        <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
-            <div class="container">
-                <h1 class="page-title">Grid 2 Columns<span>Shop</span></h1>
+        <div class="page-header text-center" style="background-image: url('/assets/images/page-header-bg.jpg')">
+            <div class="container-fluid">
+                <h1 class="page-title" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">ELECTRO MANIA <span style="font-size: 80%;">Shop</span></h1>
             </div><!-- End .container -->
         </div><!-- End .page-header -->
         <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
-            <div class="container">
+            <div class="container-fluid">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                    <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Grid 2 Columns</li>
+                    <li style="justify-content: end; "  class="breadcrumb-item"><a  style="color: red; "  href="/shop"> Clean all</a></li></li>
                 </ol>
+                
             </div><!-- End .container -->
         </nav><!-- End .breadcrumb-nav -->
 
         <div class="page-content">
-            <div class="container">
+            <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-9">
                         <div class="toolbox">
@@ -189,16 +192,9 @@
                                     </div>
                                 </div><!-- End .toolbox-sort -->
                                 <div class="toolbox-layout">
-                                    <a href="category-list.html" class="btn-layout">
-                                        <svg width="16" height="10">
-                                            <rect x="0" y="0" width="4" height="4" />
-                                            <rect x="6" y="0" width="10" height="4" />
-                                            <rect x="0" y="6" width="4" height="4" />
-                                            <rect x="6" y="6" width="10" height="4" />
-                                        </svg>
-                                    </a>
+                                    
 
-                                    <a href="category-2cols.html" class="btn-layout active">
+                                    <a href= "" class="btn-layout active" data-columns="2">
                                         <svg width="10" height="10">
                                             <rect x="0" y="0" width="4" height="4" />
                                             <rect x="6" y="0" width="4" height="4" />
@@ -207,7 +203,7 @@
                                         </svg>
                                     </a>
 
-                                    <a href="category.html" class="btn-layout">
+                                    <a href= "" class="btn-layout active" data-columns="3">
                                         <svg width="16" height="10">
                                             <rect x="0" y="0" width="4" height="4" />
                                             <rect x="6" y="0" width="4" height="4" />
@@ -218,7 +214,7 @@
                                         </svg>
                                     </a>
 
-                                    <a href="category-4cols.html" class="btn-layout">
+                                    <a href= "" class="btn-layout active" data-columns="4">
                                         <svg width="22" height="10">
                                             <rect x="0" y="0" width="4" height="4" />
                                             <rect x="6" y="0" width="4" height="4" />
@@ -230,7 +226,8 @@
                                             <rect x="18" y="6" width="4" height="4" />
                                         </svg>
                                     </a>
-                                </div><!-- End .toolbox-layout -->
+                                </div>
+                                <!-- End .toolbox-layout -->
                             </div><!-- End .toolbox-right -->
                         </div><!-- End .toolbox -->
 
@@ -240,7 +237,7 @@
                                 <% for(i=0;i<product.length; i++){%>
 
 
-                                <div class="col-6 product-item" >
+                                <div class="  col-lg-4 product-item" >
                                     
                                     <div class="theproduct product product-7 text-center">
                                     
@@ -337,7 +334,7 @@
                               </li>
                             </ul>
                           </nav>
-                          <% }else{ %>
+                          <% }else if(categories){ %>
 
                             <nav aria-label="Page navigation">
                                 <ul class="pagination justify-content-center">
@@ -348,18 +345,88 @@
                                   </li>
                                   <% for (let i = 1; i <= totalpages; i++) { %>
                                     <li class="page-item <%= currentPage === i ? 'active' : '' %>" aria-current="page">
-                                      <a class="page-link" href="/shop?page=<%= i %> "><%= i %></a>
+                                      <a class="page-link" href="/shop?page=<%= i %>&categories=<%= categories %>&max=<%= max %>"><%= i %></a>
                                     </li>
                                   <% } %>
                                   <li class="page-item-total">of <%= totalpages %></li>
                                   <li class="page-item <%= currentPage === totalpages ? 'disabled' : '' %>">
-                                    <a class="page-link page-link-next" href="/shop?page=<%= currentPage + 1 %> " aria-label="Next">
+                                    <a class="page-link page-link-next" href="/shop?page=<%= currentPage + 1 %>&categories=<%= categories %>&max=<%= max %> " aria-label="Next">
                                       Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
                                     </a>
                                   </li>
                                 </ul>
                               </nav>
-                            <% } %>
+                            <% }else if(search){ %>
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-center">
+                                      <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link page-link-prev" href="/shop?page=<%= currentPage - 1 %>" aria-label="Previous">
+                                          <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                                        </a>
+                                      </li>
+                                      <% for (let i = 1; i <= totalpages; i++) { %>
+                                        <li class="page-item <%= currentPage === i ? 'active' : '' %>" aria-current="page">
+                                          <a class="page-link" href="/shop?page=<%= i %>&search=<%= search %>&max=<%= max %> "><%= i %></a>
+                                        </li>
+                                      <% } %>
+                                      <li class="page-item-total">of <%= totalpages %></li>
+                                      <li class="page-item <%= currentPage === totalpages ? 'disabled' : '' %>">
+                                        <a class="page-link page-link-next" href="/shop?page=<%= currentPage + 1 %>&search=<%= search %>&max=<%= max %> " aria-label="Next">
+                                          Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </nav>
+
+                                  <% } else if(price) { %>
+
+                                    <nav aria-label="Page navigation">
+                                        <ul class="pagination justify-content-center">
+                                          <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                            <a class="page-link page-link-prev" href="/shop?page=<%= currentPage - 1 %>" aria-label="Previous">
+                                              <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                                            </a>
+                                          </li>
+                                          <% for (let i = 1; i <= totalpages; i++) { %>
+                                            <li class="page-item <%= currentPage === i ? 'active' : '' %>" aria-current="page">
+                                              <a class="page-link" href="/shop?page=<%= i %>&price=<%= price %>&max=<%= max %> "><%= i %></a>
+                                            </li>
+                                          <% } %>
+                                          <li class="page-item-total">of <%= totalpages %></li>
+                                          <li class="page-item <%= currentPage === totalpages ? 'disabled' : '' %>">
+                                            <a class="page-link page-link-next" href="/shop?page=<%= currentPage + 1 %>&price=<%= price %>&max=<%= max %> " aria-label="Next">
+                                              Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                                            </a>
+                                          </li>
+                                        </ul>
+                                      </nav>
+                                      
+
+
+
+                            <% }else{ %>
+
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-center">
+                                      <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link page-link-prev" href="/shop?page=<%= currentPage - 1 %>" aria-label="Previous">
+                                          <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                                        </a>
+                                      </li>
+                                      <% for (let i = 1; i <= totalpages; i++) { %>
+                                        <li class="page-item <%= currentPage === i ? 'active' : '' %>" aria-current="page">
+                                          <a class="page-link" href="/shop?page=<%= i %>&max=<%= max %> "><%= i %></a>
+                                        </li>
+                                      <% } %>
+                                      <li class="page-item-total">of <%= totalpages %></li>
+                                      <li class="page-item <%= currentPage === totalpages ? 'disabled' : '' %>">
+                                        <a class="page-link page-link-next" href="/shop?page=<%= currentPage + 1 %>&max=<%= max %> " aria-label="Next">
+                                          Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                                        </a>
+                                      </li>
+                                    </ul>
+                                  </nav>
+                                <% } %>
                          
                           
                           
@@ -368,7 +435,7 @@
                         <div class="sidebar sidebar-shop">
                             <div class="widget widget-clean">
                                 <label>Filters:</label>
-                                <a href="#" class="sidebar-filter-clear">Clean All</a>
+                                <a href="/shop" class="">Clean All</a>
                             </div><!-- End .widget widget-clean -->
                             
                             
@@ -396,13 +463,24 @@
                                         <div class="filter-items">
                                             <!-- Loop through the cata array and generate checkboxes -->
                                             <% cata.forEach((category) => { %>
+
+                                               
                                                 <div class="filter-item">
                                                     <div class="custom-control custom-checkbox">
-                                                        <input type="checkbox" onchange="applyFilters()" class="custom-control-input" id="cat-<%= category._id %>" name="<%= category.catagory %>">
+                                                        <input type="checkbox"  class="custom-control-input" id="cat-<%= category._id %>" name="<%= category.catagory %>">
                                                         <label class="custom-control-label" for="cat-<%= category.id %>"><%= category.catagory %></label>
                                                     </div><!-- End .custom-checkbox -->
                                                 </div><!-- End .filter-item -->
+
+                                              
+
                                             <% }); %>
+                                            <form id="filter-form" onsubmit="applyFilters()" method="get">
+                                                <!-- Add a hidden input field to hold the selected categories -->
+                                                
+                                                <input type="hidden" id="categoriesQueryParam" name="categories" value="">
+                                                <button type="submit" class="btn btn-primary">Apply</button>
+                                            </form>
                                         </div><!-- End .filter-items -->
                                     </div><!-- End .widget-body -->
                                 </div><!-- End .collapse -->
@@ -420,10 +498,25 @@
                                         <div class="filter-price">
                                             <div class="filter-price-text">
                                                 Price Range:
-                                                <span id="filter-price-range"></span>
+                                                 <span id="">₹0 - ₹1000000</span> 
                                             </div><!-- End .filter-price-text -->
 
-                                            <div id="price-slider"></div><!-- End #price-slider -->
+                                            <div ><input type="range" id="priceRange" min="0" max="1000000" step="10" value="">
+                                                <output id="priceOutput">₹0 - ₹0</output>
+                                                
+                                            </div><!-- End #price-slider -->
+
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox"  class="custom-control-input" id="price" name="low">
+                                                <label class="custom-control-label" for="price">Low to High</label>
+                                            </div>
+
+                                            <form id="price-form" onsubmit="applyprice()" method="get">
+                                                <!-- Add a hidden input field to hold the selected categories -->
+                                                
+                                                <input type="hidden" id="price-input" name="price" value="">
+                                                <button type="submit" class="btn btn-primary">Apply</button>
+                                            </form>
                                         </div><!-- End .filter-price -->
                                     </div><!-- End .widget-body -->
                                 </div><!-- End .collapse -->
@@ -799,45 +892,55 @@
 </div><!-- End .modal -->
 
 <!-- Plugins JS File -->
-
 <script>
-    // Function to send the AJAX request based on selected categories
-    function applyFilters() {
-        const selectedCategories = Array.from(document.querySelectorAll('input[type=checkbox][id^="cat-"]:checked'))
-            .map(category => category.name);
+function applyFilters() {
+    const selectedCategories = Array.from(document.querySelectorAll('input[type=checkbox][id^="cat-"]:checked'))
+        .map(category => category.name);
 
-        const categoriesQueryParam = selectedCategories.join(',');
-        window.location.href = `/shop?categories=${categoriesQueryParam}`
-    }
+    const categoriesQueryParam = selectedCategories.join(',');
+    
+    // Update the hidden input field value with the selected categories
+    document.getElementById('categoriesQueryParam').value = categoriesQueryParam;
+    
+    // Submit the form to trigger the filter
+    document.getElementById('filter-form').action= '/shop?catagories=categoriesQueryParam';
+}
+
 </script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // Select the search input field
-        const productSearchInput = document.getElementById('Productsearch');
-        // Select all product rows
-        const productItems = document.querySelectorAll('.theproduct');
+    function applyprice() {
+        const selectedCategories = document.querySelectorAll('input[type=checkbox][id^="price"]:checked')
+            
+    
+        
+        
+        // Update the hidden input field value with the selected categories
+        document.getElementById('price-input').value = selectedCategories;
+        
+        // Submit the form to trigger the filter
+        document.getElementById('price-form').action= '/shop?price=selectedCategories';
+    }
+    
+    </script>
 
-        productSearchInput.addEventListener('input', () => {
-            const searchTerm = productSearchInput.value.toLowerCase();
-            // Loop through all product items and hide those that don't match the search term
-            productItems.forEach((item) => {
-                const productName = item.querySelector('.product-title a').textContent.toLowerCase();
-                const productCategory = item.querySelector('.product-cat a').textContent.toLowerCase();
-                if (
-                    productName.includes(searchTerm) ||
-                    productCategory.includes(searchTerm)
-                ) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
+
+
+
+
+<script>
+    // Get the price range input element
+    const priceRange = document.getElementById("priceRange");
+
+    // Get the output element
+    const priceOutput = document.getElementById("priceOutput");
+
+    // Update the output text when the slider value changes
+    priceRange.addEventListener("input", function() {
+        const selectedPrice = priceRange.value;
+        priceOutput.textContent = `₹0 - ₹${selectedPrice}`;
     });
 </script>
-
-
 
 
 <script src="/assets/js/jquery.min.js"></script>

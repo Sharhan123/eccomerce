@@ -3,12 +3,13 @@ const mongoose = require('mongoose');
 const { Schema, ObjectId } = mongoose;
 
 const OrdersSchema = new Schema({
-  Userid: { type: Schema.Types.ObjectId, unique: true },
+  Userid: { type: Schema.Types.ObjectId },
   Username: { type: String },
   Shippingcost: { type: Number },
   Items: [{
-     Paymet: { type: String, required: true, enum: [ 'pod', ' online' ] },
+     Paymet: { type: String, required: true, enum: [ 'cod', 'pod' ] },
      Productid: { type: Schema.Types.ObjectId, required: true },
+     Productimg:{ type: String, required: true},
      Productname: { type: String, required: true},
      Price: { type: Number, required: true},
      Quantity: { type: Number, required: true},

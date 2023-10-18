@@ -3,12 +3,12 @@
 
     <main class="main">
         <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
-            <div class="container">
+            <div class="container-fluid">
                 <h1 class="page-title">My Account<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif, Haettenschweiler, 'Arial Narrow Bold', sans-serif; ">ELECTRO MANIA</span></h1>
             </div><!-- End .container -->
         </div><!-- End .page-header -->
         <nav aria-label="breadcrumb" class="breadcrumb-nav mb-3">
-            <div class="container">
+            <div class="container-fluid">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Home</a></li>
                     <li class="breadcrumb-item active" aria-current="page">My Account</li>
@@ -18,11 +18,11 @@
 
         <div class="page-content">
             <div class="dashboard">
-                <div class="container">
+                <div class="container-fluid">
                     <div class="row">
                         <aside class="col-md-4 col-lg-3">
-                            <ul class="nav nav-dashboard flex-column mb-3 mb-md-0" role="tablist">
-                                <li class="nav-item">
+                            <ul class="nav nav-dashboard  " role="tablist" style="flex-direction: column; justify-content: stretch;">
+                                <li class="nav-item ">
                                     <a class="nav-link active" id="tab-dashboard-link" data-toggle="tab"
                                         href="#tab-dashboard" role="tab" aria-controls="tab-dashboard"
                                         aria-selected="true">Dashboard</a>
@@ -77,41 +77,76 @@
 
 
 
-                                                                                        <div class="tab-pane fade" id="tab-orders" role="tabpanel"
-                                                            aria-labelledby="tab-orders-link">
-                                                            <% if(orders){ %>
+                                                             <div class="tab-pane fade" id="tab-orders" role="tabpanel"aria-labelledby="tab-orders-link">
+                                                            
                                                                 <div>
+                                                                    <% if(orders) { %>
                                                                     <% orders.map((order)=>{ %>
-                                                                        <div class="row mb-2"
-                                                                            style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px;">
-                                                                            <span class="col-6" style="color: blue;">
+
+                                                                        <div class="row mb-2 " id="main" style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px;  display: flex; justify-content: space-between; height: fit-content;">
+                                                                            <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
+                                                                               <p>ordered on : <%= order.Orderdate.toDateString() %></p>
+                                                                               <p style="color: brown;">  Ordered for : <%= order.Username %></p>
+                                                                              <p style=" color: green; ">Arriving: <%
+                                                                                    let fdate=new Date(order.Orderdate);
+                                                                                    fdate.setDate(fdate.getDate()+3) %>
+                                                                                    <%= fdate.toDateString() %></p>
+                                                                            </span>
+                                                                            <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
+                                                                                <p>Delivery address : <br> <%= order.Deliveryaddress.cname %> <br>  <%= order.Deliveryaddress.landmark %>,<%= order.Deliveryaddress.streetaddress %> <br> <%= order.Deliveryaddress.city %>,<%= order.Deliveryaddress.state %><br><%= order.Deliveryaddress.pincode %> </p>
+                                                                                <p style="color: brown; text-align: start;">  Items : <%= order.Items.length %> <br>
+                                                                                    Shipping cost : <%= order.Shippingcost %><br>
+                                                                                Total  : ₹<%= order.Totalamount %></p>
+                                                                               <p style=" color: green; "> 
+                                                                               </p>
+                                                                             </span>
+                                                                             <span class="col-12" style="color: blue; display: flex; justify-content: space-between; align-items: center;" >
+                                                                               
+                                                                                <p style="color: blue;"> Status : <%= order.Status %></p>
+                                                                                
+
+                                                                              
+                                                                                <button class="btn btn-primary openEditBtn" onclick="editClick({
+                                                                                   
+                                                                                    
+                                                                                })">view details</button>
+                                                                                
+                                                                                <button class="btn btn-danger">Cancel order</button>
+                                                                                
+                                                                             </span>
+                                                                             <br>
+                                                                            
+                                                                      
+                                                                        </div>
+
+                                                                        
+
+
+                                                                        <div class="row mb-2" id="sub" style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px; display: none;">
+                                                                            <span class="col-6" id="date" style="color: blue;">
                                                                                 <%= order.Orderdate.toDateString() %>
                                                                             </span>
-                                                                            <span class="col-6"
-                                                                                style="text-align: right; color: green;">Arriving: <%
-                                                                                    let edate=new Date(order.Orderdate);
-                                                                                    edate.setDate(edate.getDate()+3) %>
-                                                                                    <%= edate.toDateString() %></span>
-                                                                            <% order.Items.map((item)=>{ %>
-                                                                                <% const odate=item.Orderdate %>
-                                                                                    <div class="col-12">
-                                                                                        <div class="gcard mb-1">
-                                                                                            <a href="/vieworder?id=<%= order._id %>"><img
-                                                                                                    src="<%= item.Productimg %>"
+                                                                            
+                                                                            
+                                                                               
+                                                                                    <div class="col-12">l
+                                                                                        <div class="gcard mb-1" >
+                                                                                            <a href="/vieworder?id=<%= order._id %>"><img id="img"
+                                                                                                    src=""
                                                                                                     alt=""></a>
-                                                                                            <div class="gcard-body">
+                                                                                            <div class="gcard-body " id="name">
                                                                                                 <h6>
                                                                                                     <a href="/vieworder?id=<%= order._id %>">
-                                                                                                        <%= item.Productname %>
+                                                                                                        
                                                                                                     </a>
 
                                                                                                 </h6>
                                                                                                 <div
                                                                                                     style="display: flex;justify-content: space-between;">
-                                                                                                    <p>Quantity: <%= item.Quantity  %> <br>
-                                                                                                            Amount: $<%= item.Quantity*item.Price %>
+                                                                                                    <p id="qty">Quantity:  </p>
+                                                                                                         <p id="price">   Amount: 
                                                                                                     </p>
-                                                                                                    <a onclick="removeOrderItem('<%= item._id %>', '<%= order._id %>')"
+                                                                                                    <a onclick="removeOrderItem('', '<%= order._id %>')"
                                                                                                         class="btn btn-danger" style="color: white;" >cancel
                                                                                                         item</a>
                                                                                                 </div>
@@ -119,13 +154,12 @@
                                                                                         </div>
 
                                                                                     </div>
-                                                                                    <% }) %>
+                                                                                    
                                                                         </div>
                                                                         <% }) %>
+                                                                        <% } %>
                                                                 </div>
-                                                                <% }else{ %>
-                                                                    <h6>There is no orders yet !</h6>
-                                                                    <% } %>
+                                                                
                                                         </div><!-- .End .tab-pane -->
 
 
@@ -576,6 +610,8 @@
 
 
 
+
+
 <script>
     async function removeOrderItem(productId, orderId) {
         // AJAX request to update the quantity
@@ -599,5 +635,30 @@
 
     }
 </script>
+<script>
+    let productid;
+    let orderid
+    
+    function editClick(product) {
+        let edate=new Date(product.orderdate);
+   edate.setDate(edate.getDate()+3) 
+     let date= edate.toDateString() 
+     let price= product.quantity* product.price
+        productid = product.pid;
+        orderid = product.oid
+        document.getElementById('name').value = product.productname;
+        document.getElementById('price').value = price;
+        document.getElementById('qty').value = product.quantity;
+        document.getElementById('date').value = product.orderdate;
+        document.getElementById('img').value = product.productimg;
+        document.getElementById('arrive').value = date;
+        document.getElementById('main').style.display = 'none';
+  document.getElementById('sub').style.display = 'block';
+        
+    }
+    
+        </script>
+
+
 
 <%- include('footer.ejs') %>

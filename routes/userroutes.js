@@ -22,7 +22,7 @@ router.post('/login',usercontroller.postlogin)
 router.get('/logout',usercontroller.getlogout)
 
 
-router.get('/dash',auth.islogin,usercontroller.getprofile)
+router.get('/dash',usercontroller.getprofile)
 router.post('/primaryaddress',usercontroller.postprimaryaddress)
 router.post('/secondaryaddress',usercontroller.postsecondaryaddress)
 
@@ -50,4 +50,5 @@ router.get("/checkoutitem/:pid", (req, res) => {
 
 
   router.get('/shop',clear.clearheader,usercontroller.getshop)
+  
 module.exports = router; 
