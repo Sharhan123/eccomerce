@@ -7,7 +7,9 @@ const Product = require("../model/productmodel");
 const adata= require("../model/admin");
 const fs = require("fs");
 const path = require("path");
+const sharp = require("sharp")
 const catagory = require("../model/catagory");
+
 
 let uniqueIdentifier= Date.now();
 const order= require("../model/orders");
@@ -52,6 +54,9 @@ const addproduct= async function(req, res){
         const imagePath = `/uploads/${image.originalname}`;
         imagePaths.push(imagePath);
         
+      }
+      for( var i=0; i<imagePaths.length;i++){
+       await sharp(imagePaths[i]).resize(500, 500).toFile()       
       }
   
       // Create a new product entry with the image paths

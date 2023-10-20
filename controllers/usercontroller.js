@@ -8,8 +8,13 @@ const products = require('../model/productmodel');
 const { findOne } = require('../model/catagory');
 const cartModel = require('../model/cart');
 const Orders = require('../model/orders');
-const catagory =require('../model/catagory')
+const catagory = require('../model/catagory')
+
 require('dotenv').config()
+
+
+
+
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -26,13 +31,13 @@ var transporter = nodemailer.createTransport({
 const gethome = async function (req, res) {
   const product = await products.find({})
   const cata = await catagory.find({})
-  
-  if (req.cookies.user) {
-    let cart = await cartModel.findOne({ Userid: req.cookies.user.id});
 
-  res.render('user/home', { cookie: req.cookies.user, product ,cart: cart ? cart.Products : null, cata});
-  }else{
-    res.render('user/home', { cookie: req.cookies.user, product ,cata});
+  if (req.cookies.user) {
+    let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
+
+    res.render('user/home', { cookie: req.cookies.user, product, cart: cart ? cart.Products : null, cata });
+  } else {
+    res.render('user/home', { cookie: req.cookies.user, product, cata });
   }
 }
 
@@ -152,12 +157,12 @@ const postresendverification = async function (req, res) {
 
 
 const getlogin = async function (req, res) {
-  if(!req.cookies.user){
-  const err = req.query.error;
-  res.render('user/signin', { error: err })
-}else{
-  res.redirect('/')
-}
+  if (!req.cookies.user) {
+    const err = req.query.error;
+    res.render('user/signin', { error: err })
+  } else {
+    res.redirect('/')
+  }
 }
 
 
@@ -186,7 +191,7 @@ const postlogin = async function (req, res) {
 
         if (isMatch) {
           // Passwords match, redirect to the root URL
-          res.cookie('user', cdata, { maxAge: 24 * 60 * 60 * 1000 , httpOnly: true });
+          res.cookie('user', cdata, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
           res.redirect('/');
         } else {
           // Passwords do not match, handle accordingly
@@ -208,30 +213,30 @@ const getlogout = async function (req, res) {
 
 const getprofile = async function (req, res) {
 
-  
-  
-  
-  
 
 
 
 
 
-  if(req.cookies.user){
-    userid= req.cookies.user.id
-  const orders = await Orders.find({Userid:userid})
-  const address = await useraddresscopy.findOne({ Userid: req.cookies.user.id });
-  const pdata = await userdatacopy.findOne({ email: req.cookies.user.email }).then((data) => {
-    return {
-      name: data.username,
-      email: data.email,
-      dob: data.dob,
-      gender: data.gender,
-    }
-  })
-    res.render('user/profile', { cookies: pdata, address: address ,error:req.query.error ,orders})
-  }else{
-    res.render('user/profile', { cookies: "", address:"" ,error:req.query.error  , orders:""})
+
+
+
+
+  if (req.cookies.user) {
+    userid = req.cookies.user.id
+    const orders = await Orders.find({ Userid: userid })
+    const address = await useraddresscopy.findOne({ Userid: req.cookies.user.id });
+    const pdata = await userdatacopy.findOne({ email: req.cookies.user.email }).then((data) => {
+      return {
+        name: data.username,
+        email: data.email,
+        dob: data.dob,
+        gender: data.gender,
+      }
+    })
+    res.render('user/profile', { cookies: pdata, address: address, error: req.query.error, orders })
+  } else {
+    res.render('user/profile', { cookies: "", address: "", error: req.query.error, orders: "" })
   }
 }
 
@@ -243,7 +248,7 @@ const postprimaryaddress = async function (req, res) {
   const address = {
     Userid: id,
     PrimaryAddress: {
-      Name:req.body.name,
+      Name: req.body.name,
       Country: req.body.country,
       States: req.body.state,
       City: req.body.city,
@@ -270,7 +275,7 @@ const postsecondaryaddress = async function (req, res) {
   const id = req.cookies.user.id;
   const saddress = {
     SecondaryAddress: {
-      Name:req.body.name,
+      Name: req.body.name,
       Country: req.body.country,
       States: req.body.state,
       City: req.body.city,
@@ -301,7 +306,7 @@ const editprofile = async function (req, res) {
         data.password = bpassword
       }
     } else {
-      
+
     }
     data.username = req.body.name
     data.email = req.body.email
@@ -317,17 +322,17 @@ const editprofile = async function (req, res) {
 
 const getproductdetials = async function (req, res) {
   const id = req.params.pid;
-  const otherproducts= await products.find({})
+  const otherproducts = await products.find({})
   const product = await products.findOne({ _id: id })
 
 
-  if(req.cookies.user){
+  if (req.cookies.user) {
 
     const cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-  
-    res.render('user/product', { product, cookie: req.cookies.user , otherproducts, cart})
-  }else{
-    res.render('user/product', { product, cookie: req.cookies.user , otherproducts, cart:""})
+
+    res.render('user/product', { product, cookie: req.cookies.user, otherproducts, cart })
+  } else {
+    res.render('user/product', { product, cookie: req.cookies.user, otherproducts, cart: "" })
   }
 }
 
@@ -389,17 +394,17 @@ const addtocarthome = async function (req, res) {
   }
 }
 
-const getCart =  async function (req, res){
-  if(req.cookies.user){
+const getCart = async function (req, res) {
+  if (req.cookies.user) {
     let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-    const err=req.query.error
-    res.render('user/cart', { cart: cart ? cart.Products : null  , error: err})
-  }else{
+    const err = req.query.error
+    res.render('user/cart', { cart: cart ? cart.Products : null, error: err })
+  } else {
     res.redirect('/sin?error=you have to login to use cart');
   }
 }
 
-const updatecart= async function (req, res){
+const updatecart = async function (req, res) {
   let productId = req.params.id;
   console.log(productId);
   const newQuantity = req.body.quantity;
@@ -408,19 +413,19 @@ const updatecart= async function (req, res){
     if (!cart) {
       return res.status(404).json({ message: "Cart not found." });
     }
-    const product = cart.Products.find((p)=> p._id == productId )
+    const product = cart.Products.find((p) => p._id == productId)
     console.log(product);
     product.Quantity = newQuantity
     console.log("Product saved");
     await cart.save();
     res.status(200).json({ message: "Quantity updated successfully" });
   } catch (error) {
-    console.log("Product NOT saved : "+ error.message);
+    console.log("Product NOT saved : " + error.message);
     res.status(500).json({ error: "Error updating quantity" });
   }
 }
 
-const removecart= async function (req,res){
+const removecart = async function (req, res) {
   try {
     const productId = req.params.pid;
     let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
@@ -429,7 +434,7 @@ const removecart= async function (req,res){
       return res.status(404).json({ message: "Cart not found." });
     }
 
-    
+
     const productIndex = cart.Products.findIndex(
       (item) => item.Productid.toString() === productId
     );
@@ -443,7 +448,7 @@ const removecart= async function (req,res){
   }
 }
 
-const checkout= async function (req, res) {
+const checkout = async function (req, res) {
   const pid = req.query.pid;
   if (pid) {
     const product = await products.findById(pid);
@@ -459,35 +464,37 @@ const checkout= async function (req, res) {
 }
 
 
-const cartcheckout= async function (req, res) {
+const cartcheckout = async function (req, res) {
   const user = await userdatacopy.findById(req.cookies.user.id);
   const address = await useraddresscopy.findOne({ Userid: user._id });
   const cart = await cartModel.findOne({ Userid: user._id });
   console.log(cart);
-  if(cart.Products[0]){
+  if (cart.Products[0]) {
 
     res.render("user/checkout", {
       product: null,
       user: user,
       address: address,
       cart: cart.Products,
-      
-  })
-  }else{
-  res.redirect('/viewcart?error:you have no products')  
-  
-}
+
+    })
+  } else {
+    res.redirect('/viewcart?error:you have no products')
+
+  }
 }
 
-const saveorder= async function (req, res) {
-  try{
+const saveorder = async function (req, res) {
+  try {
+
+    let orderid
     let date = new Date()
-    let payment= req.body.payment
+    let payment = req.body.payment
     let userId
-    if(req.cookies.user){
-       userId = req.cookies.user.id;
+    if (req.cookies.user) {
+      userId = req.cookies.user.id;
     }
-    
+
     const user = await userdatacopy.findById(userId);
 
     if (!user) {
@@ -510,16 +517,16 @@ const saveorder= async function (req, res) {
         Quantity: req.body.quantity
       }];
 
-    }else if (Array.isArray(productId)){
+    } else if (Array.isArray(productId)) {
 
-    
-    productDetails = await products.find({ _id: { $in: productId } });
+
+      productDetails = await products.find({ _id: { $in: productId } });
       if (!productDetails) {
         return res.status(400).json({ message: 'Products not found for the given IDs' });
       }
-      orderItems = productDetails.map((product,index) => {
+      orderItems = productDetails.map((product, index) => {
         return {
-          Paymet:payment,
+          Paymet: payment,
           Productid: product._id,
           Productname: product.Productname,
           Productimg: product.Imagepath[0],
@@ -527,10 +534,10 @@ const saveorder= async function (req, res) {
           Quantity: req.body.quantity[index],
         };
       });
-    }else{
-      
-        return res.status(400).json({ message: 'Invalid product ID(s) provided' });
-      
+    } else {
+
+      return res.status(400).json({ message: 'Invalid product ID(s) provided' });
+
     }
 
     const deliveryAddress = {
@@ -544,52 +551,62 @@ const saveorder= async function (req, res) {
     };
 
 
-    
 
-    
+
+
     const totalAmount = orderItems.reduce((total, item) => total + item.Price * item.Quantity, 0);
 
     const orderData = {
       Userid: user._id,
       Username: user.username,
       Shippingcost: 0,
-      Status:'pending',
+      Status: 'pending',
       Items: orderItems,
       Deliveryaddress: deliveryAddress,
       Totalamount: totalAmount,
       Orderdate: date,
     };
 
-     await Orders.create(orderData);
+    await Orders.create(orderData);
 
-    
+    orderid = await Orders.findOne({ Orderdate: date })
 
 
-    if(payment==='pod'){
-      await Orders.updateOne({Orderdate:date},{$set:{Status:'pending'}})
-    }else if(payment==='cod'){
-      await Orders.updateOne({Orderdate:date},{$set:{Status:'active'}})
+
+
+    if (payment === 'pod') {
+      var options = {
+        amount: totalAmount ,
+        currency: "INR",
+        receipt: "" + orderid,
+      };
+
+      instance.orders.create(options, function (err, order) {
+        res.json({ order });
+      });
+    } else if (payment === 'cod') {
+      await Orders.updateOne({ Orderdate: date }, { $set: { Status: 'active' } })
     }
 
 
     res.redirect('/placeorder?userId');
-  } catch(err){
+  } catch (err) {
     console.error(err);
   }
 }
 
 
-const placeorder= async function(req, res, next){
-   userid=req.cookies.user.id
-  const name= req.cookies.user.id
-  const address = await Orders.findOne({ Userid:name})
+const placeorder = async function (req, res, next) {
+  userid = req.cookies.user.id
+  const name = req.cookies.user.id
+  const address = await Orders.findOne({ Userid: name })
   const cart = await cartModel.findOne({ Userid: userid });
 
-  cart.Products=[]
+  cart.Products = []
 
   await cart.save();
 
-  res.render('user/placeorder',{address} )
+  res.render('user/placeorder', { address })
 }
 
 
@@ -597,13 +614,13 @@ const placeorder= async function(req, res, next){
 
 
 
-const getshop = async function(req, res, next) {
+const getshop = async function (req, res, next) {
   let search = req.query.search
-  let name= req.query.name
+  let name = req.query.name
   let categories = req.query.categories
-  let catagry 
-  let min= req.query.min || 0
-  let max= req.query.max || 9999999999999999
+  let catagry
+  let min = req.query.min || 0
+  let max = req.query.max || 9999999999999999
   let price = req.query.price
   if (categories) {
     // If multiple categories are passed, split them into an array
@@ -617,20 +634,20 @@ const getshop = async function(req, res, next) {
       catagry = { $in: categoryArray };
     }
   }
-  if(name){
+  if (name) {
 
-    if(price){
-    const cata = await catagory.find({})
-    const page = parseInt(req.query.page) || 1;
-    const productsPerPage = 6;
-    const count = await products.countDocuments({Category:name})
-    const skip = (page - 1) * productsPerPage;
-    const product= await products.find({Category:name,Price: {$gt:min,$lt:max}}).skip(skip).limit(productsPerPage).sort({Price:1})
-    const totalpages = Math.ceil(count/productsPerPage)
+    if (price) {
+      const cata = await catagory.find({})
+      const page = parseInt(req.query.page) || 1;
+      const productsPerPage = 6;
+      const count = await products.countDocuments({ Category: name })
+      const skip = (page - 1) * productsPerPage;
+      const product = await products.find({ Category: name, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage).sort({ Price: 1 })
+      const totalpages = Math.ceil(count / productsPerPage)
 
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-    
+
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -639,10 +656,10 @@ const getshop = async function(req, res, next) {
           totalpages,
           cata,
           name,
-          search:"",
+          search: "",
           price
         });
-      }else {
+      } else {
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -650,22 +667,22 @@ const getshop = async function(req, res, next) {
           totalpages,
           cata,
           name,
-          search:"",
+          search: "",
           price
         });
       }
-    }else{
+    } else {
       const cata = await catagory.find({})
-    const page = parseInt(req.query.page) || 1;
-    const productsPerPage = 6;
-    const count = await products.countDocuments({Category:name})
-    const skip = (page - 1) * productsPerPage;
-    const product= await products.find({Category:name,Price: {$gt:min,$lt:max}}).skip(skip).limit(productsPerPage)
-    const totalpages = Math.ceil(count/productsPerPage)
+      const page = parseInt(req.query.page) || 1;
+      const productsPerPage = 6;
+      const count = await products.countDocuments({ Category: name })
+      const skip = (page - 1) * productsPerPage;
+      const product = await products.find({ Category: name, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage)
+      const totalpages = Math.ceil(count / productsPerPage)
 
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-    
+
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -674,10 +691,10 @@ const getshop = async function(req, res, next) {
           totalpages,
           cata,
           name,
-          search:"",
-          price:""
+          search: "",
+          price: ""
         });
-      }else {
+      } else {
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -685,30 +702,30 @@ const getshop = async function(req, res, next) {
           totalpages,
           cata,
           name,
-          search:"",
-          price:""
+          search: "",
+          price: ""
         });
       }
     }
-  
-  }else if(catagry){
-    
+
+  } else if (catagry) {
+
 
     console.log(catagry);
 
-    if(price){
+    if (price) {
 
       const cata = await catagory.find({})
       const page = parseInt(req.query.page) || 1;
       const productsPerPage = 6;
-      const count = await products.countDocuments({Category:catagry})
+      const count = await products.countDocuments({ Category: catagry })
       const skip = (page - 1) * productsPerPage;
-      const product= await products.find({Category:catagry,Price: {$gt:min,$lt:max}}).skip(skip).limit(productsPerPage).sort({Price:1})
-      const totalpages = Math.ceil(count/productsPerPage)
-  
+      const product = await products.find({ Category: catagry, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage).sort({ Price: 1 })
+      const totalpages = Math.ceil(count / productsPerPage)
+
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-    
+
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -717,12 +734,12 @@ const getshop = async function(req, res, next) {
           totalpages,
           cata,
           categories,
-          name:"",
-          search:"",
+          name: "",
+          search: "",
           price,
           max
         });
-      }else {
+      } else {
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -730,26 +747,26 @@ const getshop = async function(req, res, next) {
           totalpages,
           cata,
           categories,
-          name:"",
-          search:"",
+          name: "",
+          search: "",
           price,
           max,
         });
       }
 
-    }else{
+    } else {
 
-    const cata = await catagory.find({})
+      const cata = await catagory.find({})
       const page = parseInt(req.query.page) || 1;
       const productsPerPage = 6;
-      const count = await products.countDocuments({Category:catagry})
+      const count = await products.countDocuments({ Category: catagry })
       const skip = (page - 1) * productsPerPage;
-      const product= await products.find({Category:catagry,Price: {$gt:min,$lt:max}}).skip(skip).limit(productsPerPage)
-      const totalpages = Math.ceil(count/productsPerPage)
-  
+      const product = await products.find({ Category: catagry, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage)
+      const totalpages = Math.ceil(count / productsPerPage)
+
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-    
+
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -758,12 +775,12 @@ const getshop = async function(req, res, next) {
           totalpages,
           cata,
           categories,
-          name:"",
-          search:"",
-          price:"",
+          name: "",
+          search: "",
+          price: "",
           max
         });
-      }else {
+      } else {
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -771,224 +788,224 @@ const getshop = async function(req, res, next) {
           totalpages,
           cata,
           categories,
-          name:"",
-          search:"",
-          price:"",
+          name: "",
+          search: "",
+          price: "",
           max
         });
       }
     }
-    }else if(search){
-if(price){
-  const regex = new RegExp(search, 'i')
-
-    const cata = await catagory.find({})
-    const page = parseInt(req.query.page) || 1;
-   const productsPerPage = 6;
-   const count = await products.countDocuments({
-    $or: [
-      { Productname: regex }, // Match product name
-      { Category: regex },    // Match product category
-    ]
-  })
-   // Calculate the number of products to skip based on the current page
-   const skip = (page - 1) * productsPerPage;
- 
-   // Query the database to get the products for the current page
-   const product = await products.find({
-    $or: [
-      { Productname: regex }, // Match product name
-      { Category: regex },    // Match product category
-    ],Price: {$gt:min,$lt:max}
-  })
-     .skip(skip)
-     .limit(productsPerPage)
-     .sort({Price:1});
-     const totalpages = Math.ceil(count/productsPerPage)
-
-     
-   if (req.cookies.user) {
-     let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
- 
-     res.render('user/shop', {
-       cookie: req.cookies.user,
-       product,
-       cart: cart ? cart.Products : null,
-       currentPage: page,
-       totalpages,
-       cata,
-       name:"",
-       categories:"",
-       search,
-       price,
-       max
-     });
-   } else {
-     res.render('user/shop', {
-       cookie: req.cookies.user,
-       product,
-       currentPage: page,
-       totalpages,
-       cata,
-       name: "",
-       categories:"",
-       search,
-       price,
-       max
-     });
-   }
-}else{
+  } else if (search) {
+    if (price) {
       const regex = new RegExp(search, 'i')
 
-    const cata = await catagory.find({})
-    const page = parseInt(req.query.page) || 1;
-   const productsPerPage = 6;
-   const count = await products.countDocuments({
-    $or: [
-      { Productname: regex }, // Match product name
-      { Category: regex },    // Match product category
-    ]
-  })
-   // Calculate the number of products to skip based on the current page
-   const skip = (page - 1) * productsPerPage;
- 
-   // Query the database to get the products for the current page
-   const product = await products.find({
-    $or: [
-      { Productname: regex }, // Match product name
-      { Category: regex },    // Match product category
-    ],Price: {$gt:min,$lt:max}
-  })
-     .skip(skip)
-     .limit(productsPerPage);
-     const totalpages = Math.ceil(count/productsPerPage)
-
-     
-   if (req.cookies.user) {
-     let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
- 
-     res.render('user/shop', {
-       cookie: req.cookies.user,
-       product,
-       cart: cart ? cart.Products : null,
-       currentPage: page,
-       totalpages,
-       cata,
-       name:"",
-       categories:"",
-       search,
-       price:"",
-       max
-     });
-   } else {
-     res.render('user/shop', {
-       cookie: req.cookies.user,
-       product,
-       currentPage: page,
-       totalpages,
-       cata,
-       name: "",
-       categories:"",
-       search,
-       price:"",
-       max
-     });
-   }
-  }
-  }else{
-    if(price){
       const cata = await catagory.find({})
-    const page = parseInt(req.query.page) || 1;
-   const productsPerPage = 6;
-   const count = await products.countDocuments({})
-   // Calculate the number of products to skip based on the current page
-   const skip = (page - 1) * productsPerPage;
- 
-   // Query the database to get the products for the current page
-   const product = await products.find({Price: {$gt:min,$lt:max}})
-     .skip(skip)
-     .limit(productsPerPage)
-     .sort({Price:1});
-     const totalpages = Math.ceil(count/productsPerPage)
-   if (req.cookies.user) {
-     let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
- 
-     res.render('user/shop', {
-       cookie: req.cookies.user,
-       product,
-       cart: cart ? cart.Products : null,
-       currentPage: page,
-       totalpages,
-       cata,
-       name:"",
-       categories:"",
-       search:"",
-       price,
-       max
-     });
-   } else {
-     res.render('user/shop', {
-       cookie: req.cookies.user,
-       product,
-       currentPage: page,
-       totalpages,
-       cata,
-       name: "",
-       categories:"",
-       search:"",
-       price,
-       max
-     });
-   }
-  
-    }else{
+      const page = parseInt(req.query.page) || 1;
+      const productsPerPage = 6;
+      const count = await products.countDocuments({
+        $or: [
+          { Productname: regex }, // Match product name
+          { Category: regex },    // Match product category
+        ]
+      })
+      // Calculate the number of products to skip based on the current page
+      const skip = (page - 1) * productsPerPage;
 
-    
-    const cata = await catagory.find({})
-    const page = parseInt(req.query.page) || 1;
-   const productsPerPage = 6;
-   const count = await products.countDocuments({})
-   // Calculate the number of products to skip based on the current page
-   const skip = (page - 1) * productsPerPage;
- 
-   // Query the database to get the products for the current page
-   const product = await products.find({Price: {$gt:min,$lt:max}})
-     .skip(skip)
-     .limit(productsPerPage);
-     const totalpages = Math.ceil(count/productsPerPage)
-   if (req.cookies.user) {
-     let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
- 
-     res.render('user/shop', {
-       cookie: req.cookies.user,
-       product,
-       cart: cart ? cart.Products : null,
-       currentPage: page,
-       totalpages,
-       cata,
-       name:"",
-       categories:"",
-       search:"",
-       price:"",
-       max
-     });
-   } else {
-     res.render('user/shop', {
-       cookie: req.cookies.user,
-       product,
-       currentPage: page,
-       totalpages,
-       cata,
-       name: "",
-       categories:"",
-       search:"",
-       price:"",
-       max
-     });
-   }
+      // Query the database to get the products for the current page
+      const product = await products.find({
+        $or: [
+          { Productname: regex }, // Match product name
+          { Category: regex },    // Match product category
+        ], Price: { $gt: min, $lt: max }
+      })
+        .skip(skip)
+        .limit(productsPerPage)
+        .sort({ Price: 1 });
+      const totalpages = Math.ceil(count / productsPerPage)
+
+
+      if (req.cookies.user) {
+        let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
+
+        res.render('user/shop', {
+          cookie: req.cookies.user,
+          product,
+          cart: cart ? cart.Products : null,
+          currentPage: page,
+          totalpages,
+          cata,
+          name: "",
+          categories: "",
+          search,
+          price,
+          max
+        });
+      } else {
+        res.render('user/shop', {
+          cookie: req.cookies.user,
+          product,
+          currentPage: page,
+          totalpages,
+          cata,
+          name: "",
+          categories: "",
+          search,
+          price,
+          max
+        });
+      }
+    } else {
+      const regex = new RegExp(search, 'i')
+
+      const cata = await catagory.find({})
+      const page = parseInt(req.query.page) || 1;
+      const productsPerPage = 6;
+      const count = await products.countDocuments({
+        $or: [
+          { Productname: regex }, // Match product name
+          { Category: regex },    // Match product category
+        ]
+      })
+      // Calculate the number of products to skip based on the current page
+      const skip = (page - 1) * productsPerPage;
+
+      // Query the database to get the products for the current page
+      const product = await products.find({
+        $or: [
+          { Productname: regex }, // Match product name
+          { Category: regex },    // Match product category
+        ], Price: { $gt: min, $lt: max }
+      })
+        .skip(skip)
+        .limit(productsPerPage);
+      const totalpages = Math.ceil(count / productsPerPage)
+
+
+      if (req.cookies.user) {
+        let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
+
+        res.render('user/shop', {
+          cookie: req.cookies.user,
+          product,
+          cart: cart ? cart.Products : null,
+          currentPage: page,
+          totalpages,
+          cata,
+          name: "",
+          categories: "",
+          search,
+          price: "",
+          max
+        });
+      } else {
+        res.render('user/shop', {
+          cookie: req.cookies.user,
+          product,
+          currentPage: page,
+          totalpages,
+          cata,
+          name: "",
+          categories: "",
+          search,
+          price: "",
+          max
+        });
+      }
+    }
+  } else {
+    if (price) {
+      const cata = await catagory.find({})
+      const page = parseInt(req.query.page) || 1;
+      const productsPerPage = 6;
+      const count = await products.countDocuments({})
+      // Calculate the number of products to skip based on the current page
+      const skip = (page - 1) * productsPerPage;
+
+      // Query the database to get the products for the current page
+      const product = await products.find({ Price: { $gt: min, $lt: max } })
+        .skip(skip)
+        .limit(productsPerPage)
+        .sort({ Price: 1 });
+      const totalpages = Math.ceil(count / productsPerPage)
+      if (req.cookies.user) {
+        let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
+
+        res.render('user/shop', {
+          cookie: req.cookies.user,
+          product,
+          cart: cart ? cart.Products : null,
+          currentPage: page,
+          totalpages,
+          cata,
+          name: "",
+          categories: "",
+          search: "",
+          price,
+          max
+        });
+      } else {
+        res.render('user/shop', {
+          cookie: req.cookies.user,
+          product,
+          currentPage: page,
+          totalpages,
+          cata,
+          name: "",
+          categories: "",
+          search: "",
+          price,
+          max
+        });
+      }
+
+    } else {
+
+
+      const cata = await catagory.find({})
+      const page = parseInt(req.query.page) || 1;
+      const productsPerPage = 6;
+      const count = await products.countDocuments({})
+      // Calculate the number of products to skip based on the current page
+      const skip = (page - 1) * productsPerPage;
+
+      // Query the database to get the products for the current page
+      const product = await products.find({ Price: { $gt: min, $lt: max } })
+        .skip(skip)
+        .limit(productsPerPage);
+      const totalpages = Math.ceil(count / productsPerPage)
+      if (req.cookies.user) {
+        let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
+
+        res.render('user/shop', {
+          cookie: req.cookies.user,
+          product,
+          cart: cart ? cart.Products : null,
+          currentPage: page,
+          totalpages,
+          cata,
+          name: "",
+          categories: "",
+          search: "",
+          price: "",
+          max
+        });
+      } else {
+        res.render('user/shop', {
+          cookie: req.cookies.user,
+          product,
+          currentPage: page,
+          totalpages,
+          cata,
+          name: "",
+          categories: "",
+          search: "",
+          price: "",
+          max
+        });
+      }
+    }
   }
 }
-}
 
 
 
@@ -999,7 +1016,7 @@ if(price){
 
 
 
-const removeorder = async function(req, res,){
+const removeorder = async function (req, res,) {
   try {
     const orderId = req.params.id;
     const Ordersid = req.params.oid;
@@ -1031,11 +1048,19 @@ const removeorder = async function(req, res,){
 }
 
 
-const filtershop = async (req, res) =>{
-  
- 
-    
-    }
+
+
+// generateRazorpay:(orderid,amount)=>{
+//   return new Promise((resolve, reject) =>{
+//     instance.orders.create({
+//       amount: amount,
+//       currency: "INR",
+//       receipt: orderid
+
+//     })
+//   })
+// }
+
 
 
 
@@ -1065,5 +1090,5 @@ module.exports = {
   placeorder,
   getshop,
   removeorder,
-  filtershop
+
 } 
