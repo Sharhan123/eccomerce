@@ -231,6 +231,7 @@
                             </div><!-- End .toolbox-right -->
                         </div><!-- End .toolbox -->
 
+                         
                         <div class="products mb-3">
                             <div class="row justify-content-center">
 
@@ -507,7 +508,7 @@
                                             </div><!-- End #price-slider -->
 
                                             <div class="custom-control custom-checkbox">
-                                                <input type="checkbox"  class="custom-control-input" id="price" name="low">
+                                                <input type="checkbox"  class="custom-control-input" id="price" name="low" value="low">
                                                 <label class="custom-control-label" for="price">Low to High</label>
                                             </div>
 
@@ -910,16 +911,17 @@ function applyFilters() {
 
 <script>
     function applyprice() {
-        const selectedCategories = document.querySelectorAll('input[type=checkbox][id^="price"]:checked')
+        const selectedCategories = document.querySelectorAll('input[type=checkbox][id^="price"]:checked').value
             
-    
-        
+
+        let value = document.getElementById("price").value
+        console.log(selectedCategories);
         
         // Update the hidden input field value with the selected categories
         document.getElementById('price-input').value = selectedCategories;
         
         // Submit the form to trigger the filter
-        document.getElementById('price-form').action= '/shop?price=selectedCategories';
+        document.getElementById('price-form').action= '/shop?price=""';
     }
     
     </script>

@@ -3,7 +3,7 @@ var router = express.Router();
 var catagories= require('../model/catagory')
 var Usercopy = require("../model/schema");
 const multer = require("multer");
-const Product = require("../model/productmodel");
+const Product = require("../model/product");
 const adata= require("../model/admin");
 const fs = require("fs");
 const path = require("path");
@@ -12,9 +12,10 @@ const catagory = require("../model/catagory");
 
 
 let uniqueIdentifier= Date.now();
-const order= require("../model/orders");
+
 const Orders = require("../model/orders");
 const Banner = require("../model/banner");
+const { Console } = require("console");
 
 
 
@@ -27,14 +28,67 @@ const postadmin= async function(req,res){
     const data=await adata.findOne({email: req.body.email})
     if(req.body.password===data.password) {
       res.cookie("admin",req.body.email, { maxAge: 3600000, httpOnly: true });
-    res.render('admin/dashboard')
+    res.redirect('/admin/dashboard')
     }else{
       res.render('admin/login',{error:"email address or password is incorrect"});
     }
 }
 
-const getdashboard=function(req, res){
-    res.render('admin/dashboard')
+const getdashboard=  async function(req, res){
+
+  try{
+
+
+    let pro = await Product.find().limit(3)
+    let data = await Orders.find({Status:'delivered'})
+    let count = await Orders.countDocuments({Status:'delivered'}) 
+    let acount = await Orders.countDocuments({Status:'active'})
+    let ccount = await Orders.countDocuments({Status:'Cancelled'})  
+    let user = await Usercopy.countDocuments()
+    // Filter delivered orders
+    let totalyear= 0
+data.forEach((data)=>{
+  
+  totalyear += data.Totalamount
+})
+   
+console.log(totalyear);
+
+// Calculate monthly income
+const monthlyIncome = {};
+data.forEach(order => {
+  const date = new Date(order.Orderdate);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1; // Month is zero-based, so add 1
+  const key = `${year}-${month}`;
+  
+  if (!monthlyIncome[key]) {
+    monthlyIncome[key] = 0;
+  }
+
+  monthlyIncome[key] += order.Totalamount;
+});
+
+// Calculate yearly income
+const yearlyIncome = {};
+data.forEach(order => {
+  const year = new Date(order.Orderdate).getFullYear();
+  
+  if (!yearlyIncome[year]) {
+    yearlyIncome[year] = 0;
+  }
+
+  yearlyIncome[year] += order.Totalamount;
+});
+
+console.log("Monthly Income:", monthlyIncome);
+console.log("Yearly Income:", yearlyIncome);
+
+    res.render('admin/dashboard',{monthlyIncome,yearlyIncome,count,totalyear,acount,ccount,user,pro})
+  }catch(err){
+    Console.log(err)
+  }
+
 }
 
 const getproducts= async function(req, res){
@@ -55,9 +109,7 @@ const addproduct= async function(req, res){
         imagePaths.push(imagePath);
         
       }
-      for( var i=0; i<imagePaths.length;i++){
-       await sharp(imagePaths[i]).resize(500, 500).toFile()       
-      }
+      
   
       // Create a new product entry with the image paths
       const newProduct = new Product({

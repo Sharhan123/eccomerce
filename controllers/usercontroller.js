@@ -4,11 +4,24 @@ const userdatacopy = require('../model/schema')
 const bycrypt = require('bcrypt')
 const nodemailer = require('nodemailer');
 const useraddresscopy = require('../model/address')
-const products = require('../model/productmodel');
+const products = require('../model/product');
 const { findOne } = require('../model/catagory');
 const cartModel = require('../model/cart');
 const Orders = require('../model/orders');
 const catagory = require('../model/catagory')
+const helper = require('../helpers/paymenthelper')
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
+
+
+const { errorMonitor } = require('nodemailer/lib/xoauth2');
+const ban = require('../model/banner');
+
+var instance = new Razorpay({
+  key_id: 'rzp_test_f0CUyOMdkz5Ems',
+  key_secret: 'jVlliMIYj9LGEaoxylbCt0j1',
+});
+
 
 require('dotenv').config()
 
@@ -31,13 +44,13 @@ var transporter = nodemailer.createTransport({
 const gethome = async function (req, res) {
   const product = await products.find({})
   const cata = await catagory.find({})
-
+  const banner = await ban.find({})
   if (req.cookies.user) {
     let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
 
-    res.render('user/home', { cookie: req.cookies.user, product, cart: cart ? cart.Products : null, cata });
+    res.render('user/home', { cookie: req.cookies.user, product, cart: cart ? cart.Products : null, cata, banner });
   } else {
-    res.render('user/home', { cookie: req.cookies.user, product, cata });
+    res.render('user/home', { cookie: req.cookies.user, product, cata, banner });
   }
 }
 
@@ -224,7 +237,12 @@ const getprofile = async function (req, res) {
 
   if (req.cookies.user) {
     userid = req.cookies.user.id
-    const orders = await Orders.find({ Userid: userid })
+    const orders = await Orders.find({
+      Userid: userid,
+      Status: { $in: ["active", "delivered", "shipped"] }
+    });
+    const cancel = await Orders.find({Userid: userid, Status: { $in:'Cancelled'}})
+
     const address = await useraddresscopy.findOne({ Userid: req.cookies.user.id });
     const pdata = await userdatacopy.findOne({ email: req.cookies.user.email }).then((data) => {
       return {
@@ -234,9 +252,9 @@ const getprofile = async function (req, res) {
         gender: data.gender,
       }
     })
-    res.render('user/profile', { cookies: pdata, address: address, error: req.query.error, orders })
+    res.render('user/profile', { cookies: pdata, address: address, error: req.query.error, orders,cancel })
   } else {
-    res.render('user/profile', { cookies: "", address: "", error: req.query.error, orders: "" })
+    res.render('user/profile', { cookies: "", address: "", error: req.query.error, orders: "",cancel: "" })
   }
 }
 
@@ -448,6 +466,8 @@ const removecart = async function (req, res) {
   }
 }
 
+
+
 const checkout = async function (req, res) {
   const pid = req.query.pid;
   if (pid) {
@@ -464,12 +484,14 @@ const checkout = async function (req, res) {
 }
 
 
+
 const cartcheckout = async function (req, res) {
   const user = await userdatacopy.findById(req.cookies.user.id);
   const address = await useraddresscopy.findOne({ Userid: user._id });
   const cart = await cartModel.findOne({ Userid: user._id });
   console.log(cart);
   if (cart.Products[0]) {
+
 
     res.render("user/checkout", {
       product: null,
@@ -478,6 +500,7 @@ const cartcheckout = async function (req, res) {
       cart: cart.Products,
 
     })
+
   } else {
     res.redirect('/viewcart?error:you have no products')
 
@@ -486,7 +509,7 @@ const cartcheckout = async function (req, res) {
 
 const saveorder = async function (req, res) {
   try {
-
+    console.log(req.body);
     let orderid
     let date = new Date()
     let payment = req.body.payment
@@ -513,7 +536,8 @@ const saveorder = async function (req, res) {
         Paymet: payment,
         Productid: productDetails._id,
         Productname: productDetails.Productname,
-        Price: productDetails.Price,
+        Productimg: productDetails.Imagepath[0],
+        Price: productDetails.Price - productDetails.Discount,
         Quantity: req.body.quantity
       }];
 
@@ -530,7 +554,7 @@ const saveorder = async function (req, res) {
           Productid: product._id,
           Productname: product.Productname,
           Productimg: product.Imagepath[0],
-          Price: product.Price,
+          Price: product.Price - product.Discount,
           Quantity: req.body.quantity[index],
         };
       });
@@ -567,7 +591,9 @@ const saveorder = async function (req, res) {
       Orderdate: date,
     };
 
-    await Orders.create(orderData);
+    await Orders.create(orderData).then((data) => {
+      console.log("saved" + data);
+    });
 
     orderid = await Orders.findOne({ Orderdate: date })
 
@@ -575,25 +601,28 @@ const saveorder = async function (req, res) {
 
 
     if (payment === 'pod') {
-      var options = {
-        amount: totalAmount ,
-        currency: "INR",
-        receipt: "" + orderid,
-      };
+      console.log("Entered");
+      await Orders.updateOne({ Orderdate: date }, { $set: { Status: 'active' } })
+      helper.generateRazorpay(orderid._id, totalAmount).then((response) => {
+        console.log(response);
+        res.json(response);
+      })
 
-      instance.orders.create(options, function (err, order) {
-        res.json({ order });
-      });
+
+
     } else if (payment === 'cod') {
       await Orders.updateOne({ Orderdate: date }, { $set: { Status: 'active' } })
+      res.json({ codsuccess: true })
     }
 
 
-    res.redirect('/placeorder?userId');
+
   } catch (err) {
     console.error(err);
   }
 }
+
+
 
 
 const placeorder = async function (req, res, next) {
@@ -612,8 +641,6 @@ const placeorder = async function (req, res, next) {
 
 
 
-
-
 const getshop = async function (req, res, next) {
   let search = req.query.search
   let name = req.query.name
@@ -622,6 +649,7 @@ const getshop = async function (req, res, next) {
   let min = req.query.min || 0
   let max = req.query.max || 9999999999999999
   let price = req.query.price
+  console.log(price);
   if (categories) {
     // If multiple categories are passed, split them into an array
     const categoryArray = categories.split(',');
@@ -1009,13 +1037,6 @@ const getshop = async function (req, res, next) {
 
 
 
-
-
-
-
-
-
-
 const removeorder = async function (req, res,) {
   try {
     const orderId = req.params.id;
@@ -1049,19 +1070,85 @@ const removeorder = async function (req, res,) {
 
 
 
+const verifyPayment = async (req, res) => {
+  try {
+    console.log();
+    const cartData = await cartModel.findOne({ Userid: req.cookies.user.id });
+    const product = cartData.Products;
+    const details = req.body;
 
-// generateRazorpay:(orderid,amount)=>{
-//   return new Promise((resolve, reject) =>{
-//     instance.orders.create({
-//       amount: amount,
-//       currency: "INR",
-//       receipt: orderid
+    const hmac = crypto.createHmac("sha256", 'jVlliMIYj9LGEaoxylbCt0j1');
+    console.log(details['order[receipt]']);
 
-//     })
-//   })
-// }
+    hmac.update(
+      details['payment[razorpay_order_id]'] +
+      "|" +
+      details['payment[razorpay_payment_id]']
+    );
+
+    const hmacValue = hmac.digest("hex");
+
+    if (hmacValue === details['payment[razorpay_signature]']) {
+      for (let i = 0; i < product.length; i++) {
+        const pro = product[i].Productid;
+        const count = product[i].Quantity;
+        await products.updateOne(
+          { _id: pro },
+          { $inc: { Stoke: -count } }
+        );
+      }
+
+      await Orders.updateOne(
+        { _id: details['order[receipt]'] },
+        { $set: { Status: 'active' } }
+      );
+
+      await Orders.findByIdAndUpdate(
+        { _id: details['order[receipt]'] },
+        {
+          $set: { paymentId: details['payment[razorpay_payment_id]'] }
+        });
+
+      const orderid = details['order[receipt]'];
+
+      res.json({ codsuccess: true, orderid });
+    } else {
+      await Orders.findByIdAndRemove({ _id: details['order[receipt]'] });
+      res.json({ success: false });
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
 
+const vieworder = async function (req, res, next) {
+  try {
+    let id = req.query.id
+
+    const order = await Orders.findOne({ _id: id });
+    console.log("order", order);
+    res.render('user/vieworder', { order: order })
+
+
+
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const cancelorder = async function (req, res, next) {
+  try {
+
+    let order = req.params.id
+
+    await Orders.findOneAndUpdate({ _id: order }, { $set: { Status: 'Cancelled' } })
+    next()
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 
 
@@ -1090,5 +1177,7 @@ module.exports = {
   placeorder,
   getshop,
   removeorder,
-
+  verifyPayment,
+  vieworder,
+  cancelorder
 } 

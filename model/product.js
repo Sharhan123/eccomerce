@@ -11,7 +11,7 @@ const ProductsSchema = new Schema({
   Price: { type: Number, required: true },
   Discount: { type: Number },
   Shipingcost: { type: Number },
-  Stoke: { type: String, required: true },
+  Stoke: { type: Number, required: true },
   Imagepath: [{ type: String, required: true }],
 });
 

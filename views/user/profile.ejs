@@ -33,7 +33,7 @@
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" id="tab-downloads-link" data-toggle="tab" href="#tab-downloads"
-                                        role="tab" aria-controls="tab-downloads" aria-selected="false">Downloads</a>
+                                        role="tab" aria-controls="tab-downloads" aria-selected="false">Cancelled orders</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address"
@@ -82,81 +82,77 @@
                                                                 <div>
                                                                     <% if(orders) { %>
                                                                     <% orders.map((order)=>{ %>
-
-                                                                        <div class="row mb-2 " id="main" style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px;  display: flex; justify-content: space-between; height: fit-content;">
-                                                                            <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
-                                                                               <p>ordered on : <%= order.Orderdate.toDateString() %></p>
-                                                                               <p style="color: brown;">  Ordered for : <%= order.Username %></p>
-                                                                              <p style=" color: green; ">Arriving: <%
-                                                                                    let fdate=new Date(order.Orderdate);
-                                                                                    fdate.setDate(fdate.getDate()+3) %>
-                                                                                    <%= fdate.toDateString() %></p>
-                                                                            </span>
-                                                                            <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
-                                                                                <p>Delivery address : <br> <%= order.Deliveryaddress.cname %> <br>  <%= order.Deliveryaddress.landmark %>,<%= order.Deliveryaddress.streetaddress %> <br> <%= order.Deliveryaddress.city %>,<%= order.Deliveryaddress.state %><br><%= order.Deliveryaddress.pincode %> </p>
-                                                                                <p style="color: brown; text-align: start;">  Items : <%= order.Items.length %> <br>
-                                                                                    Shipping cost : <%= order.Shippingcost %><br>
-                                                                                Total  : ₹<%= order.Totalamount %></p>
-                                                                               <p style=" color: green; "> 
-                                                                               </p>
-                                                                             </span>
-                                                                             <span class="col-12" style="color: blue; display: flex; justify-content: space-between; align-items: center;" >
-                                                                               
-                                                                                <p style="color: blue;"> Status : <%= order.Status %></p>
-                                                                                
-
-                                                                              
-                                                                                <button class="btn btn-primary openEditBtn" onclick="editClick({
-                                                                                   
-                                                                                    
-                                                                                })">view details</button>
-                                                                                
-                                                                                <button class="btn btn-danger">Cancel order</button>
-                                                                                
-                                                                             </span>
-                                                                             <br>
-                                                                            
-                                                                      
-                                                                        </div>
+                                                                        <% if(order.Status==='delivered') { %>
 
                                                                         
 
-
-                                                                        <div class="row mb-2" id="sub" style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px; display: none;">
-                                                                            <span class="col-6" id="date" style="color: blue;">
-                                                                                <%= order.Orderdate.toDateString() %>
-                                                                            </span>
-                                                                            
-                                                                            
-                                                                               
-                                                                                    <div class="col-12">l
-                                                                                        <div class="gcard mb-1" >
-                                                                                            <a href="/vieworder?id=<%= order._id %>"><img id="img"
-                                                                                                    src=""
-                                                                                                    alt=""></a>
-                                                                                            <div class="gcard-body " id="name">
-                                                                                                <h6>
-                                                                                                    <a href="/vieworder?id=<%= order._id %>">
-                                                                                                        
-                                                                                                    </a>
-
-                                                                                                </h6>
-                                                                                                <div
-                                                                                                    style="display: flex;justify-content: space-between;">
-                                                                                                    <p id="qty">Quantity:  </p>
-                                                                                                         <p id="price">   Amount: 
-                                                                                                    </p>
-                                                                                                    <a onclick="removeOrderItem('', '<%= order._id %>')"
-                                                                                                        class="btn btn-danger" style="color: white;" >cancel
-                                                                                                        item</a>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-
-                                                                                    </div>
+                                                                            <div class="row mb-2 " id="main" style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px;  display: flex; justify-content: space-between; height: fit-content;">
+                                                                                <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
+                                                                                   <p>ordered on : <%= order.Orderdate.toDateString() %></p>
+                                                                                   <p style="color: brown;">  Ordered for : <%= order.Username %></p>
+                                                                                  <p style=" color: green; ">Delivered on : <%
+                                                                                        let fdate=new Date(order.Orderdate);
+                                                                                        fdate.setDate(fdate.getDate()+3) %>
+                                                                                        <%= fdate.toDateString() %></p>
+                                                                                </span>
+                                                                                
+                                                                                 <span class="col-12" style="color: blue; display: flex; justify-content: space-between; align-items: center;" >
+                                                                                   
+                                                                                    <h6 style="color: rgb(3, 133, 46);"> Status : <%= order.Status %></h6>
                                                                                     
-                                                                        </div>
+    
+                                                                                  
+                                                                                    <a href="/vieworder?id=<%= order._id %>"><button class="btn btn-primary openEditBtn" >view details</button></a>
+                                                                                    
+                                                                                    <button class="btn btn-danger">Return order</button>
+                                                                                    
+                                                                                 </span>
+                                                                                 <br>
+                                                                                
+                                                                          
+                                                                            </div>
+                                                                        <% } else { %>
+                                                                            <div class="row mb-2 " id="main" style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px;  display: flex; justify-content: space-between; height: fit-content;">
+                                                                                <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
+                                                                                   <p>ordered on : <%= order.Orderdate.toDateString() %></p>
+                                                                                   <p style="color: brown;">  Ordered for : <%= order.Username %></p>
+                                                                                  <p style=" color: green; ">Arriving: <%
+                                                                                        let fdate=new Date(order.Orderdate);
+                                                                                        fdate.setDate(fdate.getDate()+3) %>
+                                                                                        <%= fdate.toDateString() %></p>
+                                                                                </span>
+                                                                                <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
+                                                                                    <p>Delivery address : <br> <%= order.Deliveryaddress.cname %> <br>  <%= order.Deliveryaddress.landmark %>,<%= order.Deliveryaddress.streetaddress %> <br> <%= order.Deliveryaddress.city %>,<%= order.Deliveryaddress.state %><br><%= order.Deliveryaddress.pincode %> </p>
+                                                                                    <p style="color: brown; text-align: start;">  Items : <%= order.Items.length %> <br>
+                                                                                        Shipping cost : <%= order.Shippingcost %><br>
+                                                                                    Total  : ₹<%= order.Totalamount %></p>
+                                                                                   <p style=" color: green; "> 
+                                                                                   </p>
+                                                                                 </span>
+                                                                                 <span class="col-12" style="color: blue; display: flex; justify-content: space-between; align-items: center;" >
+                                                                                   
+                                                                                    <p style="color: blue;"> Status : <%= order.Status %></p>
+                                                                                    
+    
+                                                                                  
+                                                                                    <a href="/vieworder?id=<%= order._id %>"><button class="btn btn-primary openEditBtn" >view details</button></a>
+                                                                                    
+                                                                                    <button class="btn btn-danger"  onclick="removeOrderItem('<%= order._id %>')" >Cancel order</button>
+                                                                                    
+                                                                                 </span>
+                                                                                 <br>
+                                                                                
+                                                                          
+                                                                            </div>
+                                                                            <% } %>
+
+
+                                                                        
                                                                         <% }) %>
+                                                                        <% }else{  %>
+                                                                            
+                                                                            
+
                                                                         <% } %>
                                                                 </div>
                                                                 
@@ -167,9 +163,39 @@
 
                                 <div class="tab-pane fade" id="tab-downloads" role="tabpanel"
                                     aria-labelledby="tab-downloads-link">
-                                    <p>No downloads available yet.</p>
+                                    <% if(cancel){ %>
+                                        <% cancel.map((order)=>{ %>
+                                        <div class="row mb-2 " id="main" style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px;  display: flex; justify-content: space-between; height: fit-content;">
+                                            <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
+                                               <p>ordered on : <%= order.Orderdate.toDateString() %></p>
+                                               <p style="color: rgb(42, 42, 165);">  Ordered for : <%= order.Username %></p>
+                                              <p style=" color: green; ">Ordered on : <%
+                                                    let fdate=new Date(order.Orderdate);
+                                                    fdate.setDate(fdate.getDate()+3) %>
+                                                    <%= fdate.toDateString() %></p>
+                                            </span>
+                                            
+                                             <span class="col-12" style="color: blue; display: flex; justify-content: space-between; align-items: center;" >
+                                               
+                                                <h6 style="color: rgb(222, 5, 5);"> Status : <%= order.Status %></h6>
+                                                
+
+                                              
+                                                <a href="/vieworder?id=<%= order._id %>"><button class="btn btn-primary openEditBtn" >view details</button></a>
+                                                
+                                                <button class="btn btn-danger" onclick="reorder('<%= order._id %>')">Re Order</button>
+                                                
+                                             </span>
+                                             <br>
+                                            
+                                      
+                                        </div>
+                                        <% }) %>
+                                        <% }else{ %>
+                                    <p>No orders available yet.</p>
                                     <a href="category.html" class="btn btn-outline-primary-2"><span>GO SHOP</span><i
                                             class="icon-long-arrow-right"></i></a>
+                                            <% } %>
                                 </div><!-- .End .tab-pane -->
 
                                 <!-- Primary Address form -->
@@ -613,13 +639,36 @@
 
 
 <script>
-    async function removeOrderItem(productId, orderId) {
+    async function removeOrderItem( orderId) {
         // AJAX request to update the quantity
         const prompt = confirm('Are you sure you want to cancel the order?');
         if (prompt) {
             $.ajax({
                 type: 'GET',
-                url: '/removeorderitem/' + productId + '/' + orderId,
+                url: '/removeorder/'+ orderId,
+                success: function (response) {
+                    console.log('Order Item Removed successfully:', response);
+                    // Update the total price and any other UI elements as needed
+                    // For simplicity, let's reload the page to update the UI after quantity change
+                    location.reload();
+                },
+                error: function (error) {
+                    console.error('Error removing order item:', error);
+                    location.reload();
+                }
+            });
+        }
+
+    }
+</script>
+<script>
+    async function reorder( orderId) {
+        // AJAX request to update the quantity
+        const prompt = confirm('Are you sure you want to reorder the order?');
+        if (prompt) {
+            $.ajax({
+                type: 'GET',
+                url: '/reorder/'+ orderId,
                 success: function (response) {
                     console.log('Order Item Removed successfully:', response);
                     // Update the total price and any other UI elements as needed

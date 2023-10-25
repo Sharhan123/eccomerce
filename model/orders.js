@@ -9,7 +9,7 @@ const OrdersSchema = new Schema({
   Items: [{
      Paymet: { type: String, required: true, enum: [ 'cod', 'pod' ] },
      Productid: { type: Schema.Types.ObjectId, required: true },
-     Productimg:{ type: String, required: true},
+     Productimg:{ type: String},
      Productname: { type: String, required: true},
      Price: { type: Number, required: true},
      Quantity: { type: Number, required: true},

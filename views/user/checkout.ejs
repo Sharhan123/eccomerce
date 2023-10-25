@@ -25,7 +25,7 @@
                             <label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click here to enter your code</span></label>
                         </form>
                     </div><!-- End .checkout-discount -->
-                    <form action="/saveorder" method="post">
+                    <form   id="the-checkout-form">
                         <div class="row">
                             <div class="col-lg-9">
                                 <h2 class="checkout-title">Billing Details</h2><!-- End .checkout-title -->
@@ -77,7 +77,7 @@
                                         <input type="checkbox" class="custom-control-input" id="checkout-diff-address">
                                         <label class="custom-control-label" for="checkout-diff-address">Save this as primary address</label>
                                     </div> -->
-
+                                   
                                     <div class="row">
                                         <div class="col-sm-6" style="display: flex; flex-direction: column;" >
                                             
@@ -109,6 +109,7 @@
                                             </label>
                                         </div>
                                     </div>
+                                    
                             </div><!-- End .col-lg-9 -->
                             <aside class="col-lg-3">
                                 <div class="summary" style="background-color: white;">
@@ -153,7 +154,7 @@
                                             </tr>
                                             <tr class="summary-total">
                                                 <td>Total:</td>
-                                                <td>₹<%= subtotal %></td>
+                                                <td id="total">₹<%= subtotal %></td>
                                             </tr><!-- End .summary-total -->
                                         </tbody>
                                     </table><!-- End .table table-summary -->
@@ -293,6 +294,7 @@
 const primaryCheckbox = document.getElementById("first");
 const secondaryCheckbox = document.getElementById("second");
 
+
 // Add an event listener to the checkboxes
 primaryCheckbox.addEventListener("change", change);
 secondaryCheckbox.addEventListener("change", change);
@@ -304,7 +306,11 @@ function change() {
 
     // Get the address object based on the selected value (you'll need to define your address object)
     let selectedAddress;
+    
+
+   
     if (selectedValue === "primary") {
+
         document.getElementById('name').value= "<%= address.PrimaryAddress.Name%>"
         document.getElementById('country').value= "<%= address.PrimaryAddress.Country%>"
         document.getElementById('landmark').value= "<%= address.PrimaryAddress.Landmark%>"
@@ -321,8 +327,96 @@ function change() {
         document.getElementById('pin').value= "<%= address.SecondaryAddress.Pincode%>"
         document.getElementById('phone').value= "<%= address.SecondaryAddress.Phone%>"
     }
+
 }
 
 
 </script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.14.0/dist/sweetalert2.all.min.js"></script>
+<script>
+    document.getElementById('the-checkout-form').addEventListener('submit', (e) => {
+        console.log("AAh pressed");
+        e.preventDefault();
+        $.ajax({
+            url: "/saveorder",
+            method: "post",
+            data: $("#the-checkout-form").serialize(),
+            success: ((response) => {
+                swal.fire({
+            positon: "center",
+            icon: "success",
+            title: "do you want to make payment",
+            showConfirmButton: true,
+            timer: 1500,
+          });
+                if (response.codsuccess) {
+                    location.href = "/placeorder"
+                } else {
+                    console.log(response);
+                    razorpayPayment(response)
+                }
+            })
+        })
+    })
+
+    function razorpayPayment(order) {
+        var options = {
+            "key": "rzp_test_f0CUyOMdkz5Ems",
+            "amount": order.amount,
+            "currency": "INR",
+            "name": "ELECTROMANIA",
+            "description": "Test transaction for " + order.receipt,
+            "order_id": order.id,
+            "handler": function (response) {
+                alert(response.razorpay_payment_id);
+                alert(response.razorpay_order_id);
+                alert(response.razorpay_signature);
+
+                verifyPayment(response, order);
+            },
+            "prefill": {
+                "name": "electromania",
+                "email": "electromania@example.com",
+                "contact": "9000090000"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+        rzp1.open();  // corrected the variable name here
+    }
+    function verifyPayment(payment, order) {
+    const amount2 = document.getElementById("total").innerHTML;
+    $.ajax({
+      url: "/verify-payment",
+      method: "post",
+      data: {
+        payment: payment,
+        amount2: amount2,
+        order: order,
+      },
+      success: (response) => {
+        response.orderid
+        if (response.codsuccess) {
+          location.href = '/placeorder?oid=response.orderid';
+        } else {
+          swal.fire({
+            positon: "center",
+            icon: "error",
+            title: "Payment failed",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      },
+    });
+  }
+</script>
+
 <%- include('footer.ejs') %>
