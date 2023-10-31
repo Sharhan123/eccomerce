@@ -3,7 +3,7 @@ try{
     if(req.cookies.admin){
         next()
     }else{
-        res.redirect('/')
+        res.redirect('/getadmin')
     }
 } catch(err){
     res.send(err)

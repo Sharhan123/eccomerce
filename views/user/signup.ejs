@@ -28,7 +28,7 @@
   <p style="color:rgb(253, 0, 0); font-weight: 500;" id="eee"><%= error %></p>
     <button type="submit" class="btn btn-primary">Submit</button>
 
-    <a href="" style="color: blue;">Already exist? Sign in</a>
+    <a href="/sin" style="color: blue;">Already exist? Sign in</a>
     </div>
   </form>
 
@@ -43,10 +43,11 @@
 
   function check(){
       let name = document.querySelector('.name').value;
-      if(!name.match(/^[a-zA-Z]*$/)){
-          errorr.innerHTML = "Special charecters and numbers not allowed";
-          return false;
-      }
+      if (!name.match(/^[a-zA-Z ]*$/)) {
+  errorr.innerHTML = "Special characters and numbers not allowed";
+  return false;
+}
+
       if(name.length < 3){
           errorr.innerHTML="Name Should have minimum 3 charecters.";
           return false;

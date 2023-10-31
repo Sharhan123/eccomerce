@@ -1,0 +1,593 @@
+<%- include('head.ejs') %>
+<nav class="navbar p-0 fixed-top d-flex flex-row">
+  <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+    <a class="navbar-brand brand-logo-mini" href="index.html"><img src="assets/images/logo-mini.svg" alt="logo" /></a>
+  </div>
+  <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+    <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+      <span class="mdi mdi-menu"></span>
+    </button>
+    <ul class="navbar-nav w-100">
+      <li class="nav-item w-100">
+        <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
+          <input type="text" class="form-control" id="productSearch" placeholder="Search products">
+        </form>
+      </li>
+    </ul>
+    <ul class="navbar-nav navbar-nav-right">
+      
+      <li class="nav-item nav-settings d-none d-lg-block">
+        <a class="nav-link" href="#">
+          <i class="mdi mdi-view-grid"></i>
+        </a>
+      </li>
+      
+      <li class="nav-item dropdown">
+        <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
+          <div class="navbar-profile">
+            <img class="img-xs rounded-circle" src="/images/5e47d289f1335_thumb900.webp" alt="">
+            <p class="mb-0 d-none d-sm-block navbar-profile-name">Admin Panel</p>
+            <i class="mdi mdi-menu-down d-none d-sm-block"></i>
+          </div>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
+          <h6 class="p-3 mb-0">Profile</h6>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item preview-item">
+            
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item preview-item">
+            <div class="preview-thumbnail">
+              <div class="preview-icon bg-dark rounded-circle">
+                <i class="mdi mdi-logout text-danger"></i>
+              </div>
+            </div>
+            <div class="preview-item-content">
+              <a href="/getadmin/logout"><p class="preview-subject mb-1">Log out</p></a>
+            </div>
+          </a>
+          
+      </li>
+    </ul>
+    <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+      <span class="mdi mdi-format-line-spacing"></span>
+    </button>
+  </div>
+</nav>
+
+  
+
+
+  <div class="main-panel">
+    <div class="content-wrapper">
+     
+
+
+
+
+
+<div class="row">
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        
+        <button class="btn btn-success" id="openAddProduct">Add Products</button>
+        
+        </p>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th> Image </th>
+                <th> First name </th>
+                <th> Catagory </th>
+                <th> Amount </th>
+                <th> Stock </th>
+                <th> Actions </th>
+              </tr>
+            </thead>
+            <tbody>
+                <% if (product) { %>
+                <% product.map((product, index)=> { %>
+              <tr id="product-row">
+                <td class="py-1">
+                  <img src="<%= product.Imagepath[0] %>" alt="image" >
+                </td>
+                <td style="color: white;" id="product-name"> <%= product.Productname %> </td>
+                <td style="color: rgb(215, 190, 0);" id="product-category">
+                    <%= product.Category %>
+                </td>
+                <td style="color: rgb(255, 255, 255);"> ₹<%= product.Price %></td>
+                <% if(product.Stoke<=0) { %>
+                  <td style="color: rgb(255, 2, 2);"> Out of Stoke </td>
+
+                  <% }else { %>
+                <td style="color: rgb(15, 43, 255);"> <%= product.Stoke %> </td>
+                <% } %>
+                <td> <a  class="btn btn-danger delete-button"
+                  onclick="showDeleteConfirmation(event,'<%= product._id %>')">Delete</a> </td>
+                <td> <button class="btn btn-primary openEditBtn" onclick="editClick({
+                    pid:`<%= product._id %>`,
+                    pname:`<%= product.Productname %>`,
+                    category: `<%= product.Category %>`,
+                    specs: `<%= product.Spec %>`,
+                    desc: `<%= product.Description %>`,
+                    price: `<%= product.Price %>`,
+                    scost: `<%= product.Shipingcost %>`,
+                    discount: `<%= product.Discount %>`,
+                    stoke: `<%= product.Stoke %>`,
+                    images: `<%- product.Imagepath %>`
+                })">Edit</button>
+                 </td>
+              </tr>
+              <% }); %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="popUp-edit" style="display: none;">
+  <div><button class="btn btn-danger closeBtn-edit">close</button></div>
+  <div class="formDiv">
+      <h6 class="text-center">Edit the product  </h6>
+      <br>
+      <p class="error" style="text-align: center; color: red;"> </p>
+
+
+      <form  method="post" onsubmit="editproduct()"  id="theEditForm" enctype="multipart/form-data">
+          <div class="mb-3">
+              <label class="form-label">Product Name</label>
+              <input type="text" class="form-control" name="pname" id="pname" value="" minlength="5" maxlength="50" required>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Category</label>
+              <input type="text" class="form-control" name="category" id="category" value="" required>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Specs</label>
+              <input type="text" class="form-control" name="specs" id="specs" value="" required>
+          </div>
+          <div class="form-floating mb-3">
+              <textarea class="form-control" name="desc" placeholder="Leave a comment here" id="desc" ></textarea>
+              <label for="desc">Description</label>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Price</label>
+              <input type="number" name="price" id="price" class="form-control" value="" min="100" required>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Shipping cost</label>
+              <input type="number" name="scost" id="scost" class="form-control" value="" min="1" required>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Discount amount</label>
+              <input type="number" name="discount" id="discount" class="form-control" value="" min="1" required>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Total stoke</label>
+              <input type="number" name="stoke" id="stoke" class="form-control " value="" min="1" required>
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Select the images</label>
+              <input type="file" class="form-control" id="editfileUpload" name="images" value="" multiple>
+          </div>
+          <div id="editImagePreview"></div>
+          <button type="submit" class="btn btn-primary">Edit product</button>
+      </form>
+      
+  </div> 
+</div>
+
+
+<div class="popUp" style="display: none;">
+    <div><button class="btn btn-danger closeBtn">close</button></div>
+    <div class="formDiv">
+        <h6 class="text-center">Add new product</h6>
+        <br>
+        <p class="aerror" style="text-align: center; color: red;"> </p>
+        <form action="/getadmin/addproduct" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label">Product Name</label>
+                <input type="text" class="form-control" name="pname" value="" required maxlength="50" minlength="5"> 
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                <select class="form-label form-control" name="category">
+                    <% catagory.map((category, index)=> { %>
+                        <option value="<%= category.catagory %>" class=""><%= category.catagory %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Specs</label>
+                <input type="text" class="form-control" name="specs" value="" required>
+            </div>
+            <div class="form-floating mb-3">
+                <textarea class="form-control" name="desc"   placeholder="Leave a comment here"
+                    id="floatingTextarea"  ></textarea>
+                <label for="floatingTextarea">Description</label>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Price</label>
+                <input type="number" id="price" name="price" class="form-control" value="" required min="100">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Shipping cost</label>
+                <input type="number" name="scost" class="form-control" required>
+            <div class="mb-3">
+                <label class="form-label">Discount amount</label>
+                <input type="number" name="discount" class="form-control" value="" required min="1">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Total stock</label>
+                <input type="number" name="stoke" class="form-control" value="" required min="1">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Select the images</label>
+                <input type="file" class="form-control" id="fileUpload" name="images" value="" multiple required>
+            </div>
+            <div id="imagePreview" style="max-width: 50px;"></div>
+            <button type="submit" class="btn btn-primary">Add product</button>
+        </form>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.14.0/dist/sweetalert2.all.min.js"></script>
+
+
+
+
+
+
+
+
+
+<%- include('foot.ejs') %>
+<script>
+    let productid;
+
+    function editClick(product) {
+        productid = product.pid;
+        document.getElementById('pname').value = product.pname;
+        document.getElementById('category').value = product.category;
+        document.getElementById('specs').value = product.specs;
+        document.getElementById('desc').value = product.desc;
+        document.getElementById('price').value = product.price;
+        document.getElementById('scost').value = product.scost;
+        document.getElementById('discount').value = product.discount;
+        document.getElementById('stoke').value = product.stoke;
+
+        const imgs = product.images.split(',');
+
+        document.getElementById('editImagePreview').innerHTML = '';
+        imgs.forEach(function (imageSrc, index) {
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'image-container';
+
+            const img = document.createElement('img');
+            img.src = imageSrc;
+            img.className = 'm-1';
+            img.style.maxWidth = '80px';
+
+            const deleteLink = document.createElement('a');
+            deleteLink.innerText = 'Delete';
+            deleteLink.className = 'btn btn-danger delete-image-button';
+            deleteLink.href = `/getadmin/delproductimg/${encodeURIComponent(imageSrc)}/${productid}`;
+
+            deleteLink.onclick = function () {
+                // Remove the image container on click
+                imgContainer.remove();
+            };
+
+            imgContainer.appendChild(img);
+            imgContainer.appendChild(deleteLink);
+
+            document.getElementById('editImagePreview').appendChild(imgContainer);
+        });
+    }
+
+    
+    function editproduct() {
+        
+        document.querySelector("#theEditForm").action = "/getadmin/edit/"+productid;
+    }
+</script>
+
+
+<!-- THIS IS THE SCRIPT TO PRIVIEW IMAGES AFTER THE SELECTION -->
+<script>
+    const fileInput = document.getElementById('fileUpload');
+    const imagePreview = document.getElementById('imagePreview');
+    let selectedFiles = [];
+
+    fileInput.addEventListener('change', () => {
+        imagePreview.innerHTML = '';
+        const files = fileInput.files;
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.className = 'preview-image';
+                img.src = URL.createObjectURL(file);
+                img.setAttribute('data-index', i);
+
+                img.addEventListener('click', (event) => {
+                    const index = parseInt(event.target.getAttribute('data-index'));
+                    selectedFiles = selectedFiles.filter((_, idx) => idx !== index);
+                    updateFileInput(selectedFiles);
+                    img.remove();
+                });
+
+                img.addEventListener('mouseover', () => {
+                    img.style.opacity = '0.5';
+                });
+
+                img.addEventListener('mouseout', () => {
+                    img.style.opacity = '1';
+                });
+
+                imagePreview.appendChild(img);
+                selectedFiles.push(file);
+            }
+        }
+        updateFileInput(selectedFiles);
+    });
+
+    function updateFileInput(updatedFiles) {
+        const updatedFileList = new DataTransfer();
+        for (let i = 0; i < updatedFiles.length; i++) {
+            updatedFileList.items.add(updatedFiles[i]);
+        }
+        fileInput.files = updatedFileList.files;
+    }
+
+</script>
+
+
+<script>
+    const fileInput2 = document.getElementById('editfileUpload');
+    const imagePreview2 = document.getElementById('editImagePreview');
+
+    fileInput2.addEventListener('change', () => {
+        imagePreview2.innerHTML = '';
+
+        const files = fileInput2.files;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.className = 'preview-image';
+                img.src = URL.createObjectURL(file);
+                imagePreview2.appendChild(img);
+            }
+        }
+    });
+</script>
+
+
+
+<script>
+    $(document).ready(() => {
+        $("#openAddProduct").click(() => {
+            $(".popUp").toggle(600);
+        })
+        $(".closeBtn").click(() => {
+            $(".popUp").toggle(300);
+        })
+    })
+</script>
+<script>
+    $(document).ready(() => {
+        $(".openEditBtn").click(() => {
+            $(".popUp-edit").toggle(300);
+        })
+        $(".closeBtn-edit").click(() => {
+            $(".popUp-edit").toggle(300);
+        })
+    })
+</script>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        // Select the search input field
+        const productSearchInput = document.getElementById('productSearch');
+
+        // Select all product rows
+        const productRows = document.querySelectorAll('#product-row');
+
+        productSearchInput.addEventListener('input', () => {
+            const searchTerm = productSearchInput.value.toLowerCase();
+
+            // Loop through all product rows and hide those that don't match the search term
+            productRows.forEach((row) => {
+                const productName = row.querySelector('#product-name').textContent.toLowerCase();
+                const productCategory = row.querySelector('#product-category').textContent.toLowerCase();
+
+                if (
+                    productName.includes(searchTerm) ||
+                    productCategory.includes(searchTerm)
+                ) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+    })
+</script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      // Get a reference to the Product Name input field
+      var productNameInput = document.querySelector('input[name="pname"]');
+      var price = document.querySelector('input[name="price"]')
+      var discount = document.querySelector('input[name="discount"]')
+      // Keep track of the previously entered product names
+      var previousNames = new Set();
+      
+      // Set the maximum character limit
+      var minCharacters=5
+      var maxCharacters = 50; // Change this to your desired character limit
+      
+      // Listen for input events on the input field
+      productNameInput.addEventListener("input", function(event) {
+          var enteredName = productNameInput.value;
+          document.querySelector('.error').textContent="";
+          // Check for character limit
+          if (enteredName.length > maxCharacters) {
+              document.querySelector('.error').textContent="Product Name is too long. Please keep it under " + maxCharacters + " characters."
+              productNameInput.value = enteredName.slice(0, maxCharacters);
+          }
+          
+          if (enteredName.length < minCharacters) {
+            document.querySelector('.error').textContent="Product Name is too short. Please keep it Above " + minCharacters + " characters."
+              productNameInput.value = enteredName.slice(0, minCharacters);
+          }
+
+          // Check for repeated names
+          if (previousNames.has(enteredName)) {
+            document.querySelector('.error').textContent="Product Name is already entered . Please keep it change "
+
+              productNameInput.value = "";
+          }
+      });
+
+      price.addEventListener("input", function(event) {
+          var enteredName = price.value;
+          document.querySelector('.error').textContent="";
+          // Check for character limit
+          if (enteredName < 100) {
+              document.querySelector('.error').textContent="Price  is too short. Please keep it above 100 " 
+              productNameInput.value = enteredName.slice(0, maxCharacters);
+          }
+          
+          
+         
+      });
+
+      discount.addEventListener("input", function(event) {
+          var enteredName = discount.value;
+          document.querySelector('.error').textContent="";
+          // Check for character limit
+          if (enteredName <= 1) {
+              document.querySelector('.error').textContent="Discount price entered is too short. Please keep it above 1 " 
+              productNameInput.value = enteredName.slice(0, maxCharacters);
+          }
+          
+          
+         
+      });
+
+      
+      
+      
+  });
+</script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      // Get a reference to the Product Name input field
+      var productNameInput = document.querySelector('input[name="pname"]');
+      var price = document.querySelector('input[name="price"]')
+      var discount = document.querySelector('input[name="discount"]')
+      // Keep track of the previously entered product names
+      var previousNames = new Set();
+      
+      // Set the maximum character limit
+      var minCharacters=5
+      var maxCharacters = 50; // Change this to your desired character limit
+      
+      // Listen for input events on the input field
+      productNameInput.addEventListener("input", function(event) {
+          var enteredName = productNameInput.value;
+          document.querySelector('.aerror').textContent="";
+          // Check for character limit
+          if (enteredName.length > maxCharacters) {
+              document.querySelector('.aerror').textContent="Product Name is too long. Please keep it under " + maxCharacters + " characters."
+              productNameInput.value = enteredName.slice(0, maxCharacters);
+          }
+          
+          if (enteredName.length < minCharacters) {
+            document.querySelector('.aerror').textContent="Product Name is too short. Please keep it Above " + minCharacters + " characters."
+              productNameInput.value = enteredName.slice(0, minCharacters);
+          }
+
+          // Check for repeated names
+          if (previousNames.has(enteredName)) {
+            document.querySelector('.aerror').textContent="Product Name is already entered . Please keep it change "
+
+              productNameInput.value = "";
+          }
+      });
+
+      price.addEventListener("input", function(event) {
+          var enteredName = price.value;
+          document.querySelector('.aerror').textContent="";
+          // Check for character limit
+          if (enteredName < 100) {
+              document.querySelector('.aerror').textContent="Price  is too short. Please keep it above 100 " 
+              productNameInput.value = enteredName.slice(0, maxCharacters);
+          }
+          
+          
+         
+      });
+
+      discount.addEventListener("input", function(event) {
+          var enteredName = discount.value;
+          document.querySelector('.aerror').textContent="";
+          // Check for character limit
+          if (enteredName <= 1) {
+              document.querySelector('.aerror').textContent="Discount price entered is too short. Please keep it above 1 " 
+              productNameInput.value = enteredName.slice(0, maxCharacters);
+          }
+          
+          
+         
+      });
+
+      
+      
+      
+  });
+</script>
+
+
+<script>
+function showDeleteConfirmation(event, pid) {
+  event.preventDefault(); // Prevent the default link behavior
+
+  // Show a Swal confirmation pop-up
+  Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // If the user confirms, proceed with the deletion
+      window.location.href = `/getadmin/deleteproduct/${pid}`;
+    }
+  });
+}
+</script>
+
+
+

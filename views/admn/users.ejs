@@ -1,0 +1,217 @@
+<%- include('head.ejs') %>
+<nav class="navbar p-0 fixed-top d-flex flex-row">
+  <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+    <a class="navbar-brand brand-logo-mini" href="index.html"><img src="assets/images/logo-mini.svg" alt="logo" /></a>
+  </div>
+  <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+    <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+      <span class="mdi mdi-menu"></span>
+    </button>
+    <ul class="navbar-nav w-100">
+      <li class="nav-item w-100">
+        <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
+          <input type="text" class="form-control" id="productSearch" placeholder="Search products">
+        </form>
+      </li>
+    </ul>
+    <ul class="navbar-nav navbar-nav-right">
+      
+      <li class="nav-item nav-settings d-none d-lg-block">
+        <a class="nav-link" href="#">
+          <i class="mdi mdi-view-grid"></i>
+        </a>
+      </li>
+      
+      <li class="nav-item dropdown">
+        <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
+          <div class="navbar-profile">
+            <img class="img-xs rounded-circle" src="/images/5e47d289f1335_thumb900.webp" alt="">
+            <p class="mb-0 d-none d-sm-block navbar-profile-name">Admin Panel</p>
+            <i class="mdi mdi-menu-down d-none d-sm-block"></i>
+          </div>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
+          <h6 class="p-3 mb-0">Profile</h6>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item preview-item">
+            
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item preview-item">
+            <div class="preview-thumbnail">
+              <div class="preview-icon bg-dark rounded-circle">
+                <i class="mdi mdi-logout text-danger"></i>
+              </div>
+            </div>
+            <div class="preview-item-content">
+              <a href="/getadmin/logout"><p class="preview-subject mb-1">Log out</p></a>
+            </div>
+          </a>
+          
+      </li>
+    </ul>
+    <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+      <span class="mdi mdi-format-line-spacing"></span>
+    </button>
+  </div>
+</nav>
+
+  
+
+
+  <div class="main-panel">
+    <div class="content-wrapper">
+     
+
+
+
+
+
+<div class="row">
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        
+
+        
+        </p>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th> NO </th>
+                <th> User name </th>
+                <th> Email Id  </th>
+                <th> Action </th>
+                <th> Status </th>
+                
+              </tr>
+            </thead>
+            <tbody>
+                <% if (user) { %>
+                <% user.map((user, index)=> { %>
+              <tr id="product-row">
+                <td class="py-1">
+                 <%= index+1 %>
+                </td>
+                <td style="color: white;" id="product-name"> <%= user.username %> </td>
+                
+                <td style="color: rgb(255, 213, 0);" id="product-category"> <%= user.email %></td>
+                
+                 
+
+                  
+                <td><% if(user.Blocked){ %>
+                    <a 
+                        class="btn btn-danger delete-button" style="width: 80px;"
+                        onclick="showUnblockConfirmation(event,'<%= user._id %>')">UnBlock</a>
+                    <% } else { %>
+                        <a 
+                            class="btn btn-success delete-button" style="width: 80px;"
+                            onclick="showBlockConfirmation(event,'<%= user._id %>')">Block</a>
+                        <% } %>
+                    </td>
+                <td>
+                    <% if(user.Blocked){ %>
+                        <a style="background-color: rgba(34, 34, 232, 0); border-color: blue;"
+                            class="btn btn delete-button" style="width: 80px;"
+                            >Blocked</a>
+                        <% } else { %>
+                            <a  style="background-color: rgba(34, 34, 232, 0); border-color: rgb(255, 123, 0);"
+                                class="btn btn-success delete-button" style="width: 80px;"
+                                >Active</a>
+                            <% } %>
+                </td>
+                
+                
+              </tr>
+              <% }); %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<%- include('foot.ejs') %>
+
+<script>
+    function showBlockConfirmation(event, pid) {
+      event.preventDefault(); // Prevent the default link behavior
+    
+      // Show a Swal confirmation pop-up
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, block it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // If the user confirms, proceed with the deletion
+          window.location.href = `/getadmin/blockuser/${pid}`;
+        }
+      });
+    }
+    </script>
+
+<script>
+    function showUnblockConfirmation(event, pid) {
+      event.preventDefault(); // Prevent the default link behavior
+    
+      // Show a Swal confirmation pop-up
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, Unblock it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // If the user confirms, proceed with the deletion
+          window.location.href = `/getadmin/unblockuser/${pid}`;
+        }
+      });
+    }
+    </script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        // Select the search input field
+        const productSearchInput = document.getElementById('productSearch');
+
+        // Select all product rows
+        const productRows = document.querySelectorAll('#product-row');
+
+        productSearchInput.addEventListener('input', () => {
+            const searchTerm = productSearchInput.value.toLowerCase();
+
+            // Loop through all product rows and hide those that don't match the search term
+            productRows.forEach((row) => {
+                const productName = row.querySelector('#product-name').textContent.toLowerCase();
+                const productCategory = row.querySelector('#product-category').textContent.toLowerCase();
+
+                if (
+                    productName.includes(searchTerm) ||
+                    productCategory.includes(searchTerm)
+                ) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+    })
+</script>

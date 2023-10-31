@@ -1,9 +1,21 @@
+const user = require('../model/schema')
+
 const islogin= async function(req,res,next){
     try{
         if(req.cookies.user){
-            next()
+
+            const block = await user.findOne({_id:req.cookies.user.id})
+
+            if(block.Blocked===true){
+                res.clearCookie('user')
+                res.redirect('/')
+            }else{
+                
+                next()
+            }
+            
         }else{
-            res.render('user/profile', { cookies: "", address: "" })
+            res.redirect('/')
 
         }
     }catch(err){
@@ -11,6 +23,26 @@ const islogin= async function(req,res,next){
     }
 }
 
+
+const islogout = async function(req , res , next){
+    try{
+
+        if(req.cookies.user){
+            res.redirect('/')
+        }else{
+            next()
+        }
+
+
+    } catch(err){
+        console.log(err);
+    }
+} 
+
+
+
+
 module.exports = {
-    islogin
+    islogin,
+    islogout
 }

@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 // const indexRouter = require('./routes/user');
 const adminRouter = require('./routes/adminroutes');
 const userRouter = require('./routes/userroutes');
+const adminrouter= require('./routes/adminroutes')
 const app = express();
 
 // view engine setup
@@ -26,7 +27,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', userRouter);
 
 // app.use('/admin', usersRouter);
-app.use('/admin', adminRouter);
+
+app.use('/getadmin',adminrouter)
 mongoose.connect('mongodb://0.0.0.0:27017/projectdata').then(()=>console.log("connection successfull"));
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

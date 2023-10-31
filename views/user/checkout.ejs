@@ -343,14 +343,15 @@ function change() {
             method: "post",
             data: $("#the-checkout-form").serialize(),
             success: ((response) => {
-                swal.fire({
+               
+                if (response.codsuccess) {
+                    swal.fire({
             positon: "center",
             icon: "success",
             title: "do you want to make payment",
             showConfirmButton: true,
             timer: 1500,
           });
-                if (response.codsuccess) {
                     location.href = "/placeorder"
                 } else {
                     console.log(response);
@@ -369,9 +370,9 @@ function change() {
             "description": "Test transaction for " + order.receipt,
             "order_id": order.id,
             "handler": function (response) {
-                alert(response.razorpay_payment_id);
-                alert(response.razorpay_order_id);
-                alert(response.razorpay_signature);
+                // alert(response.razorpay_payment_id);
+                // alert(response.razorpay_order_id);
+                // alert(response.razorpay_signature);
 
                 verifyPayment(response, order);
             },

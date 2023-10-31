@@ -5,7 +5,6 @@ const bycrypt = require('bcrypt')
 const nodemailer = require('nodemailer');
 const useraddresscopy = require('../model/address')
 const products = require('../model/product');
-const { findOne } = require('../model/catagory');
 const cartModel = require('../model/cart');
 const Orders = require('../model/orders');
 const catagory = require('../model/catagory')
@@ -225,24 +224,17 @@ const getlogout = async function (req, res) {
 
 
 const getprofile = async function (req, res) {
-
-
-
-
-
-
-
-
-
-
   if (req.cookies.user) {
     userid = req.cookies.user.id
+
+    let aerror
+    
     const orders = await Orders.find({
       Userid: userid,
       Status: { $in: ["active", "delivered", "shipped"] }
     });
-    const cancel = await Orders.find({Userid: userid, Status: { $in:'Cancelled'}})
-
+    const cancel = await Orders.find({ Userid: userid, Status: { $in: 'Cancelled' } })
+    
     const address = await useraddresscopy.findOne({ Userid: req.cookies.user.id });
     const pdata = await userdatacopy.findOne({ email: req.cookies.user.email }).then((data) => {
       return {
@@ -250,11 +242,19 @@ const getprofile = async function (req, res) {
         email: data.email,
         dob: data.dob,
         gender: data.gender,
+        
       }
     })
-    res.render('user/profile', { cookies: pdata, address: address, error: req.query.error, orders,cancel })
+    if(req.query.address){
+      aerror = req.query.address
+      console.log("yes");
+    res.render('user/profile', { cookies: pdata, address: address, error: req.query.error, orders, cancel ,aerror })
+  }else{
+    res.render('user/profile', { cookies: pdata, address: address, error: req.query.error, orders, cancel ,aerror:"" })
+
+  }
   } else {
-    res.render('user/profile', { cookies: "", address: "", error: req.query.error, orders: "",cancel: "" })
+    res.render('user/profile', { cookies: "", address: "", error: req.query.error, orders: "", cancel: "" })
   }
 }
 
@@ -338,137 +338,21 @@ const editprofile = async function (req, res) {
   }
 }
 
-const getproductdetials = async function (req, res) {
-  const id = req.params.pid;
-  const otherproducts = await products.find({})
-  const product = await products.findOne({ _id: id })
 
 
-  if (req.cookies.user) {
-
-    const cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-
-    res.render('user/product', { product, cookie: req.cookies.user, otherproducts, cart })
-  } else {
-    res.render('user/product', { product, cookie: req.cookies.user, otherproducts, cart: "" })
-  }
-}
 
 
-const addtocarthome = async function (req, res) {
-  console.log("hello");
-  if (req.cookies.user) {
-    try {
-      const product = await products.findById(req.params.pid);
-      let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-
-      if (cart) {
-        const existingProduct = cart.Products.find(
-          (item) => item.Productid.toString() === product._id.toString()
-        );
-
-        if (existingProduct) {
-          existingProduct.Quantity += 1;
-        } else {
-          cart.Products.push({
-            Productid: product._id,
-            Productname: product.Productname,
-            Productimg: product.Imagepath[0],
-            Price: product.Price - product.Discount,
-            Quantity: 1,
-          });
-          await cart.save();
-        }
-
-        await cartModel.updateOne(
-          { Userid: req.cookies.user.id, "Products.Productid": product._id },
-          { $set: { "Products.$": existingProduct } }
-        );
-      } else {
-        const newcart = new cartModel({
-          Userid: req.cookies.user.id,
-          Products: [
-            {
-              Productid: product._id,
-              Productname: product.Productname,
-              Productimg: product.Imagepath[0],
-              Price: product.Price - product.Discount,
-              Quantity: 1,
-            },
-          ],
-        });
-
-        await newcart.save();
-      }
-
-      res.redirect("/");
-
-    } catch (error) {
-      console.log("Cart saving error: ", error);
-      return res.status(500).json({ message: "Internal server error." });
-    }
-  } else {
-    res.redirect('/sin?error=you have to login to use cart');
-  }
-}
-
-const getCart = async function (req, res) {
-  if (req.cookies.user) {
-    let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-    const err = req.query.error
-    res.render('user/cart', { cart: cart ? cart.Products : null, error: err })
-  } else {
-    res.redirect('/sin?error=you have to login to use cart');
-  }
-}
-
-const updatecart = async function (req, res) {
-  let productId = req.params.id;
-  console.log(productId);
-  const newQuantity = req.body.quantity;
-  try {
-    const cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-    if (!cart) {
-      return res.status(404).json({ message: "Cart not found." });
-    }
-    const product = cart.Products.find((p) => p._id == productId)
-    console.log(product);
-    product.Quantity = newQuantity
-    console.log("Product saved");
-    await cart.save();
-    res.status(200).json({ message: "Quantity updated successfully" });
-  } catch (error) {
-    console.log("Product NOT saved : " + error.message);
-    res.status(500).json({ error: "Error updating quantity" });
-  }
-}
-
-const removecart = async function (req, res) {
-  try {
-    const productId = req.params.pid;
-    let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-
-    if (!cart) {
-      return res.status(404).json({ message: "Cart not found." });
-    }
 
 
-    const productIndex = cart.Products.findIndex(
-      (item) => item.Productid.toString() === productId
-    );
 
-    cart.Products.splice(productIndex, 1);
-    await cart.save();
-    res.redirect('/viewcart')
-  } catch (error) {
-    console.log("Error deleting product from cart:", error);
-    return res.status(500).json({ message: "Internal server error." });
-  }
-}
+
+
+
 
 
 
 const checkout = async function (req, res) {
+
   const pid = req.query.pid;
   if (pid) {
     const product = await products.findById(pid);
@@ -485,158 +369,14 @@ const checkout = async function (req, res) {
 
 
 
-const cartcheckout = async function (req, res) {
-  const user = await userdatacopy.findById(req.cookies.user.id);
-  const address = await useraddresscopy.findOne({ Userid: user._id });
-  const cart = await cartModel.findOne({ Userid: user._id });
-  console.log(cart);
-  if (cart.Products[0]) {
-
-
-    res.render("user/checkout", {
-      product: null,
-      user: user,
-      address: address,
-      cart: cart.Products,
-
-    })
-
-  } else {
-    res.redirect('/viewcart?error:you have no products')
-
-  }
-}
-
-const saveorder = async function (req, res) {
-  try {
-    console.log(req.body);
-    let orderid
-    let date = new Date()
-    let payment = req.body.payment
-    let userId
-    if (req.cookies.user) {
-      userId = req.cookies.user.id;
-    }
-
-    const user = await userdatacopy.findById(userId);
-
-    if (!user) {
-      return res.status(400).json({ message: 'User not found' });
-    }
-
-    const productId = req.body.productId;
-    let productDetails;
-    let orderItems;
-    if (typeof productId === 'string') {
-      productDetails = await products.findById(productId);
-      if (!productDetails) {
-        return res.status(400).json({ message: 'Product not found for ID: ' + productId });
-      }
-      orderItems = [{
-        Paymet: payment,
-        Productid: productDetails._id,
-        Productname: productDetails.Productname,
-        Productimg: productDetails.Imagepath[0],
-        Price: productDetails.Price - productDetails.Discount,
-        Quantity: req.body.quantity
-      }];
-
-    } else if (Array.isArray(productId)) {
-
-
-      productDetails = await products.find({ _id: { $in: productId } });
-      if (!productDetails) {
-        return res.status(400).json({ message: 'Products not found for the given IDs' });
-      }
-      orderItems = productDetails.map((product, index) => {
-        return {
-          Paymet: payment,
-          Productid: product._id,
-          Productname: product.Productname,
-          Productimg: product.Imagepath[0],
-          Price: product.Price - product.Discount,
-          Quantity: req.body.quantity[index],
-        };
-      });
-    } else {
-
-      return res.status(400).json({ message: 'Invalid product ID(s) provided' });
-
-    }
-
-    const deliveryAddress = {
-      cname: req.body.uname,
-      country: req.body.country,
-      state: req.body.state,
-      city: req.body.city,
-      pincode: req.body.pincode,
-      streetaddress: req.body.streetaddress1[0],
-      landmark: req.body.streetaddress1[1],
-    };
 
 
 
 
 
-    const totalAmount = orderItems.reduce((total, item) => total + item.Price * item.Quantity, 0);
-
-    const orderData = {
-      Userid: user._id,
-      Username: user.username,
-      Shippingcost: 0,
-      Status: 'pending',
-      Items: orderItems,
-      Deliveryaddress: deliveryAddress,
-      Totalamount: totalAmount,
-      Orderdate: date,
-    };
-
-    await Orders.create(orderData).then((data) => {
-      console.log("saved" + data);
-    });
-
-    orderid = await Orders.findOne({ Orderdate: date })
 
 
 
-
-    if (payment === 'pod') {
-      console.log("Entered");
-      await Orders.updateOne({ Orderdate: date }, { $set: { Status: 'active' } })
-      helper.generateRazorpay(orderid._id, totalAmount).then((response) => {
-        console.log(response);
-        res.json(response);
-      })
-
-
-
-    } else if (payment === 'cod') {
-      await Orders.updateOne({ Orderdate: date }, { $set: { Status: 'active' } })
-      res.json({ codsuccess: true })
-    }
-
-
-
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-
-
-
-const placeorder = async function (req, res, next) {
-  userid = req.cookies.user.id
-  const name = req.cookies.user.id
-  const address = await Orders.findOne({ Userid: name })
-  const cart = await cartModel.findOne({ Userid: userid });
-
-  cart.Products = []
-
-  await cart.save();
-
-  res.render('user/placeorder', { address })
-}
 
 
 
@@ -1037,118 +777,16 @@ const getshop = async function (req, res, next) {
 
 
 
-const removeorder = async function (req, res,) {
-  try {
-    const orderId = req.params.id;
-    const Ordersid = req.params.oid;
-    console.log("orderid : " + orderId, "userid : " + Ordersid);
-
-    // Find the order and update the Items array
-    const order = await Orders.findById(Ordersid);
-
-    // Filter out the item with the given _id
-    const index = order.Items.findIndex((item) => item._id == orderId);
-    order.Totalamount = order.Totalamount - order.Items[index].Price;
-
-    order.Items = order.Items.filter(
-      (item) => item._id.toString() !== orderId
-    );
-
-    if (order.Items.length < 1) {
-      await Orders.findByIdAndRemove(Ordersid);
-    }
-    // Save the updated order
-    await order.save();
-
-    res.redirect('/dash')
-  } catch (error) {
-    console.error("Error removing item:", error);
-    res.status(500).send("Internal Server Error");
-  }
-
-}
-
-
-
-const verifyPayment = async (req, res) => {
-  try {
-    console.log();
-    const cartData = await cartModel.findOne({ Userid: req.cookies.user.id });
-    const product = cartData.Products;
-    const details = req.body;
-
-    const hmac = crypto.createHmac("sha256", 'jVlliMIYj9LGEaoxylbCt0j1');
-    console.log(details['order[receipt]']);
-
-    hmac.update(
-      details['payment[razorpay_order_id]'] +
-      "|" +
-      details['payment[razorpay_payment_id]']
-    );
-
-    const hmacValue = hmac.digest("hex");
-
-    if (hmacValue === details['payment[razorpay_signature]']) {
-      for (let i = 0; i < product.length; i++) {
-        const pro = product[i].Productid;
-        const count = product[i].Quantity;
-        await products.updateOne(
-          { _id: pro },
-          { $inc: { Stoke: -count } }
-        );
-      }
-
-      await Orders.updateOne(
-        { _id: details['order[receipt]'] },
-        { $set: { Status: 'active' } }
-      );
-
-      await Orders.findByIdAndUpdate(
-        { _id: details['order[receipt]'] },
-        {
-          $set: { paymentId: details['payment[razorpay_payment_id]'] }
-        });
-
-      const orderid = details['order[receipt]'];
-
-      res.json({ codsuccess: true, orderid });
-    } else {
-      await Orders.findByIdAndRemove({ _id: details['order[receipt]'] });
-      res.json({ success: false });
-    }
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-
-const vieworder = async function (req, res, next) {
-  try {
-    let id = req.query.id
-
-    const order = await Orders.findOne({ _id: id });
-    console.log("order", order);
-    res.render('user/vieworder', { order: order })
 
 
 
 
-  } catch (err) {
-    console.log(err);
-  }
-}
 
-const cancelorder = async function (req, res, next) {
-  try {
 
-    let order = req.params.id
 
-    await Orders.findOneAndUpdate({ _id: order }, { $set: { Status: 'Cancelled' } })
-    next()
-  } catch (err) {
-    console.log(err);
-  }
-}
+
+
+
 
 
 
@@ -1166,18 +804,7 @@ module.exports = {
   postprimaryaddress,
   postsecondaryaddress,
   editprofile,
-  getproductdetials,
-  addtocarthome,
-  getCart,
-  updatecart,
-  removecart,
   checkout,
-  cartcheckout,
-  saveorder,
-  placeorder,
   getshop,
-  removeorder,
-  verifyPayment,
-  vieworder,
-  cancelorder
-} 
+}
+

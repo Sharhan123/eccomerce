@@ -1,58 +1,76 @@
 const express = require('express');
 const router = express.Router();
 const usercontroller=require('../controllers/usercontroller')
+const productcontroller= require('../controllers/productcontroller')
+const cartcontroller = require('../controllers/cartcontroller')
 const auth= require('../middlewares/userauth')
 const clear = require('../middlewares/header')
+const ordercontroller = require('../controllers/ordercontroller')
 require('dotenv').config()
 
-router.get('/',clear.clearheader,usercontroller.gethome)
 
+// Home page //
+router.get('/',usercontroller.gethome)
 
-router.get('/register',clear.clearheader,usercontroller.getsignup)
-router.post('/sign',usercontroller.postsignup)
+// register routes
+router.get('/register',auth.islogout,usercontroller.getsignup)
+router.post('/sign',auth.islogout,usercontroller.postsignup)
 
-
+// otp verification routes
 router.get('/verify',usercontroller.getverify)
 router.post('/verify',usercontroller.postverify)
 router.post('/resendVerification/:email',usercontroller.postresendverification)
 
-
-router.get('/sin',usercontroller.getlogin)
-router.post('/login',usercontroller.postlogin) 
+// login and logout routes 
+router.get('/sin',auth.islogout,usercontroller.getlogin)
+router.post('/login',auth.islogout,usercontroller.postlogin) 
 router.get('/logout',usercontroller.getlogout)
 
-
+// profile routes
 router.get('/dash',usercontroller.getprofile)
-router.post('/primaryaddress',usercontroller.postprimaryaddress)
-router.post('/secondaryaddress',usercontroller.postsecondaryaddress)
+router.post('/primaryaddress',auth.islogin,usercontroller.postprimaryaddress)
+router.post('/secondaryaddress',auth.islogin,usercontroller.postsecondaryaddress)
+router.post('/editprofile',auth.islogin,usercontroller.editprofile)
 
 
-router.post('/editprofile',usercontroller.editprofile)
+// products and shop routes
+router.get('/productdetials/:pid',productcontroller.getproductdetials)
+router.get('/shop',clear.clearheader,usercontroller.getshop)
 
 
-router.get('/productdetials/:pid',usercontroller.getproductdetials)
+// cart adding and crud operation routes
+router.get('/addtocarthome/:pid',auth.islogin,cartcontroller.addtocarthome)
+router.get('/viewcart',auth.islogin,cartcontroller.getCart)
+router.put('/updateQuantity/:id',auth.islogin,cartcontroller.updatecart)
+router.get('/removefromcartcart/:pid',auth.islogin,cartcontroller.removecart)
+router.get('/cartcheckout' ,auth.islogin,cartcontroller.cartcheckout)
 
 
-router.get('/addtocarthome/:pid',usercontroller.addtocarthome)
-router.get('/viewcart',usercontroller.getCart)
-router.put('/updateQuantity/:id',usercontroller.updatecart)
-router.get('/removefromcartcart/:pid',usercontroller.removecart)
-router.get('/removeorderitem/:id/:oid', usercontroller.removeorder);
-router.get('/removeorder/:id',usercontroller.cancelorder)
 
-router.get('/checkout',usercontroller.checkout)
+
+
+
+router.get('/checkout',auth.islogin,usercontroller.checkout)
 router.get("/checkoutitem/:pid", (req, res) => {
     res.redirect(`/checkout?pid=${req.params.pid}`);
   });
 
-  router.get('/cartcheckout' ,auth.islogin,usercontroller.cartcheckout)
-  router.post('/saveorder',usercontroller.saveorder)
-  router.get('/placeorder',auth.islogin,usercontroller.placeorder)
-  router.get('/vieworder',auth.islogin,usercontroller.vieworder)
 
-  router.get('/shop',clear.clearheader,usercontroller.getshop)
+
+  // order managment routes
+  router.post('/saveorder',auth.islogin,ordercontroller.saveorder)
+  router.get('/placeorder',auth.islogin,ordercontroller.placeorder)
+  router.get('/vieworder',auth.islogin,ordercontroller.vieworder)
+  router.get('/removeorderitem/:id/:oid',auth.islogin, ordercontroller.removeorder);
+  router.get('/removeorder/:id',auth.islogin,ordercontroller.cancelorder)
   
 
 
-  router.post('/verify-payment',usercontroller.verifyPayment)
+
+
+  router.post('/verify-payment',ordercontroller.verifyPayment)
+
+
+
+
 module.exports = router; 

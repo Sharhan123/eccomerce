@@ -635,6 +635,18 @@
 <script src="assets/js/main.js"></script>
 
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.14.0/dist/sweetalert2.all.min.js"></script>
+
+<% if(aerror){ %>
+    <script>
+    Swal.fire({
+      title: "Info",
+      text: "You have no address yet please add",
+      icon: "info",
+      confirmButtonText: "OK"
+    });
+    </script>
+    <% } %>
 
 
 
@@ -711,3 +723,4 @@
 
 
 <%- include('footer.ejs') %>
+

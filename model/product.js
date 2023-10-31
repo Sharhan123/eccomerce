@@ -13,6 +13,7 @@ const ProductsSchema = new Schema({
   Shipingcost: { type: Number },
   Stoke: { type: Number, required: true },
   Imagepath: [{ type: String, required: true }],
+  soldcount:{type:Number,default:0}
 });
 
 const Products = mongoose.model("Products", ProductsSchema);

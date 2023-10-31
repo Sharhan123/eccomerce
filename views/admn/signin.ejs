@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <form id="login-form">
+            <h2>Login</h2>
+            <div class="input-container">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="input-container">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <script>
+        const inputContainers = document.querySelectorAll('.input-container');
+const inputs = document.querySelectorAll('input');
+
+inputs.forEach((input) => {
+    input.addEventListener('focus', (e) => {
+        e.target.parentElement.classList.add('label-animation');
+    });
+
+    input.addEventListener('blur', (e) => {
+        if (e.target.value === '') {
+            e.target.parentElement.classList.remove('label-animation');
+        }
+    });
+});
+
+document.getElementById('login-form').addEventListener('submit', function (e) {
+    e.preventDefault(); // Prevent the default form submission action
+
+    // You can add JavaScript logic here to handle the login process, like sending a request to a server.
+    // For this example, we'll simply show an alert.
+    alert('Login successful!');
+});
+
+    </script>
+</body>
+</html>
