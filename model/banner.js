@@ -12,7 +12,7 @@ const bschema= new mongoose.Schema(
         },
         catagory:{
             type:String,
-            required:true
+            
         }
 })
 

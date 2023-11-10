@@ -48,19 +48,18 @@
 <script src="assets/js/jquery.countdown.min.js"></script>
 <!-- Main JS File -->
 <script src="assets/js/main.js"></script>
-<script>
-$(function() {
-    "use strict";
-    if ($.fn.countdown) {
-        $('.coming-countdown').countdown({
-            until: new Date(2021, 7, 20), // 7th month = August / Months 0 - 11 (January  - December)
-            format: 'DHMS',
-            padZeroes: true
-        });
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.14.0/dist/sweetalert2.all.min.js"></script>
 
-        // Pause
-        // $('.coming-countdown').countdown('pause');
-    }
+<script>
+$(document).ready(() => {
+    Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: 'Order placed successfully',
+        showConfirmButton: false,
+        timer: 1500
+    });
 });
 </script>
+
 <%- include('footer.ejs') %>

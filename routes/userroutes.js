@@ -6,6 +6,8 @@ const cartcontroller = require('../controllers/cartcontroller')
 const auth= require('../middlewares/userauth')
 const clear = require('../middlewares/header')
 const ordercontroller = require('../controllers/ordercontroller')
+const wishlistcontroller = require('../controllers/whislistcontroller')
+const couponcontroller= require('../controllers/couponcontroller')
 require('dotenv').config()
 
 
@@ -39,7 +41,7 @@ router.get('/shop',clear.clearheader,usercontroller.getshop)
 
 
 // cart adding and crud operation routes
-router.get('/addtocarthome/:pid',auth.islogin,cartcontroller.addtocarthome)
+router.get('/addtocarthome/:pid',cartcontroller.addtocarthome)
 router.get('/viewcart',auth.islogin,cartcontroller.getCart)
 router.put('/updateQuantity/:id',auth.islogin,cartcontroller.updatecart)
 router.get('/removefromcartcart/:pid',auth.islogin,cartcontroller.removecart)
@@ -58,19 +60,25 @@ router.get("/checkoutitem/:pid", (req, res) => {
 
 
   // order managment routes
+  router.get('/getorder',auth.islogin,ordercontroller.getorder)
+  router.get('/getcancel',auth.islogin,ordercontroller.getcancel)
   router.post('/saveorder',auth.islogin,ordercontroller.saveorder)
   router.get('/placeorder',auth.islogin,ordercontroller.placeorder)
   router.get('/vieworder',auth.islogin,ordercontroller.vieworder)
-  router.get('/removeorderitem/:id/:oid',auth.islogin, ordercontroller.removeorder);
-  router.get('/removeorder/:id',auth.islogin,ordercontroller.cancelorder)
   
-
-
-
+  router.get('/removeorder',auth.islogin,ordercontroller.cancelorder)
+  router.post('/removepod',auth.islogin,ordercontroller.cancelpod)
+  router.get('/viewwallet',auth.islogin,ordercontroller.viewwallet)
+  router.post('/return',auth.islogin,ordercontroller.returnorder)
 
   router.post('/verify-payment',ordercontroller.verifyPayment)
 
 
-
-
+  router.get('/addwish',auth.islogin,wishlistcontroller.addtowish)
+  router.get('/wishlist',auth.islogin,wishlistcontroller.getwish)
+  router.get('/removefromwish/:id',auth.islogin,wishlistcontroller.remove)
+  router.get('/updatewish',auth.islogin,wishlistcontroller.update)
+  router.post('/applycoupon',auth.islogin,couponcontroller.applycoupon)
+  router.post('/deleteAppliedCoupon',auth.islogin,couponcontroller.deletecoupon)
+  router.get('/getcoupon',auth.islogin,couponcontroller.getcoupon)
 module.exports = router; 

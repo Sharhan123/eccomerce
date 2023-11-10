@@ -1,0 +1,84 @@
+<%- include('header.ejs') %>
+
+<div class="container-fluid">
+    <% if(userdata){ %>
+
+        <div class="row ">
+            <div class="col-12 mt-4" style="display: flex; justify-content: space-between;">
+                <h5><a href="/dash" style="text-decoration: none; color: #000;"><button class="btn ">Back to Orders</button> </a></h5>
+                
+                </h5>
+            </div>
+            <div class="allProducts row col-12 mt-1">
+                <% userdata.WalletHistory.map((item)=>{ %>
+                        <div  class="gcard2 col-12 col-lg-12 mb-2">
+                            <div style="background-color: #ffffff;" class="shadow" style="width: 100%; display: flex; padding: 10px 20px; border-radius: 10px; justify-content: space-between;">
+                                
+                                <div  class="gcard2-body p-3" >
+                                    <h6>
+                                        ₹ <%= item.Amount %>
+                                    </h6>
+                                    <span>Date: <%= item.Date.toDateString() %></span><br>
+                                    <span>Description: <%= item.Description %></span><br>
+                                    <% if(item.Status==='Credited'){ %>
+                                        <h6 style="color: rgb(78, 211, 25);" >Status: ₹<%= item.Status %></h6>    
+                                   <% }else { %>
+                                    <span style="color: rgb(255, 0, 0);">Status: ₹<%= item.Status %></span>
+                                    <% } %>
+                                </div>
+                                
+                            </div>
+                            
+                        </div>
+                        
+                    
+                    <% }) %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mt-4" style="display: flex; justify-content: space-between;">
+                <h5 style="color: rgb(2, 29, 182);"><i class="fa-solid fa-angle-down"></i> Order details</h5>
+            </div>        
+            </div>
+        </div>
+                                      
+                        <% } %>
+                </div>
+            </div>
+            
+    
+    
+               
+                
+                    
+
+
+
+<script>
+    async function removeOrderItem(productId, orderId) {
+        // AJAX request to update the quantity
+        const prompt = confirm('Are you sure you want to cancel the order?');
+        if (prompt) {
+            $.ajax({
+                type: 'GET',
+                url: '/removeorderitem/' + productId + '/' + orderId,
+                success: function (response) {
+                    console.log('Order Item Removed successfully:', response);
+                    // Update the total price and any other UI elements as needed
+                    // For simplicity, let's reload the page to update the UI after quantity change
+                    location.reload();
+                },
+                error: function (error) {
+                    console.error('Error removing order item:', error);
+                    location.reload();
+                }
+            });
+        }
+
+    }
+</script>
+
+
+
+<%- include('footer.ejs') %>
+

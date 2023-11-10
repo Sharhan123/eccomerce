@@ -11,6 +11,7 @@ const CartsSchema = new Schema({
       Productimg: { type: String, required: true },
       Price: { type: Number, required: true },
       Quantity: { type: Number, required: true },
+      Stock :{type : Number, required: true}
     },
   ],
   Userid: { type: Schema.Types.ObjectId, required: true, unique: true },

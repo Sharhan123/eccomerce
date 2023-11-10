@@ -1,0 +1,358 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<%- include('header.ejs') %>
+
+    <div class="page-wrapper">
+        <main class="main">
+            <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+                <div class="container-fluid">
+                    <h1 class="page-title"><span>ELECTRO MANIA</span></h1>
+                </div><!-- End .container -->
+            </div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container-fluid">
+                    <ol class="breadcrumb">
+                    
+                    
+                        <li class="breadcrumb-item active" aria-current="page"><a href="/getorder"><button class="btn btn-primary" style="background-color: red;">Back orders</button></a></li>
+                    </ol>
+                </div>
+                <div class="container-fluid">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        
+                        <li class="breadcrumb-item active" aria-current="page">Orders</li>
+                    </ol>
+                    
+                </div>
+                
+
+
+                <!-- End .container -->
+
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="page-content">
+                <div class="cart">
+                    <div class="container-fluid">
+                        <div class="row">
+
+
+                            
+
+
+
+
+
+                            
+                            <div class="col-lg-12">
+                                <% if(orders.length==0){ %>
+                                <h6>
+                                    You have no cancelled orders yet.
+                                </h6>
+                                <% } else { %>
+                                    <table class="table table-cart table-mobile" id="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Delivery address</th>
+            
+                                                <th>Expected Delivery </th>
+                                                <th>View order</th>
+                                                <th>Status</th>
+                                                
+                                                
+                                            </tr>
+                                        </thead>
+                                    
+    
+                                        <% orders.map((order)=>{ %>
+
+                                        <% if(order.Status=='Returned'){ %>
+                                            <tbody>
+                                            
+                                               
+                                                
+                                                    <tr>
+                                                        <td>
+                                                            
+                                                            
+                                                            
+                                                            Ordered on : <%= order.Orderdate.toDateString() %>
+                                                            <p>Delivery address : <br> <%= order.Deliveryaddress.cname %> <br>  <%= order.Deliveryaddress.landmark %>,<%= order.Deliveryaddress.streetaddress %> <br> <%= order.Deliveryaddress.city %>,<%= order.Deliveryaddress.state %><br><%= order.Deliveryaddress.pincode %> </p>
+                                                                    
+                                                            <!-- End .product -->
+                                                        </td>
+                                                        
+                                                        <td><h6 style="color: green;">Delivered on: <%
+                                                            let fdate=new Date(order.Orderdate);
+                                                            fdate.setDate(fdate.getDate()+3) %>
+                                                            <%= fdate.toDateString() %></h6>
+                                                            <br>
+                                                            <h6>Payment method :  <%= order.Items[0].Payment %></h6></td>
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        <td ><a 
+                                                                href="/vieworder?id=<%= order._id %>"><button
+                                                                    class="btn-primary" style="border: 1px solid black;">View details</button></a></td>
+                                                                    
+                                                                    <td><button style=" background: transparent; border: 1px solid rgb(255, 205, 3); color: rgb(255, 214, 8);"><%= order.Status %></button></td>
+                                                    </tr>
+                                                    
+                                                        
+                                                    
+                                                    
+                                                        
+                                                           
+                                    </tbody>
+                                        <% }else{ %>
+                                        <tbody>
+                                            
+                                               
+                                                    
+                                                        <tr>
+                                                            <td>
+                                                                
+                                                                
+                                                                
+                                                                Ordered on : <%= order.Orderdate.toDateString() %>
+                                                                <p>Delivery address : <br> <%= order.Deliveryaddress.cname %> <br>  <%= order.Deliveryaddress.landmark %>,<%= order.Deliveryaddress.streetaddress %> <br> <%= order.Deliveryaddress.city %>,<%= order.Deliveryaddress.state %><br><%= order.Deliveryaddress.pincode %> </p>
+                                                                        
+                                                                <!-- End .product -->
+                                                            </td>
+                                                            
+                                                            <td><h6 style="color: green;">Expected date: <%
+                                                                let fdate=new Date(order.Orderdate);
+                                                                fdate.setDate(fdate.getDate()+3) %>
+                                                                <%= fdate.toDateString() %></h6>
+                                                            <br>
+                                                            <h6>Payment method :  <%= order.Items[0].Payment %></h6>
+                                                            </td>
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            <td ><a 
+                                                                    href="/vieworder?id=<%= order._id %>"><button
+                                                                        class="btn-primary" style="border: 1px solid black;" >View details</button></a></td>
+                                                                        
+                                                                        <td><button style=" background: transparent; border: 1px solid red; color: red;"><%= order.Status %></button></td>
+                                                        </tr>
+                                                        
+                                                            
+                                                        
+                                                        
+                                                            
+                                                               
+                                        </tbody>
+                                   <%  } %>
+                                   <% }) %>
+                                    </table>
+                                    
+                                    <% } %>
+                                    <div class="popup" id="popup" style="display: none;">
+                                        <div><button class="btn btn-danger " id="close">close</button></div>
+                                        <div class="formDiv">
+                                            <h6 class="text-center">Return Order</h6>
+                                            <br>
+                                            <p class="aerror" style="text-align: center; color: red;"> </p>
+                                            <form action="/return" method="post">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Orderid </label>
+                                                    <input type="text" id="id" class="form-control" name="id" value="" > 
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label class="form-label">Order of MR/MRS</label>
+                                                    <input type="text" id="ordername" class="form-control" name="ordername" value="" >
+                                                </div>
+                                                <label>Reason for the Return</label>
+                                                <div class="form-floating mb-3">
+                                                   
+                                                    <textarea class="form-control" name="desc" placeholder="Leave the reason"
+                                                        id="floatingTextarea"></textarea>
+                                                </div>
+                                                
+                                                <button type="submit" class="btn btn-primary">Return Order</button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    
+
+                            
+
+
+
+                        </div><!-- End .row -->
+                        
+                    </div><!-- End .container -->
+                </div><!-- End .cart -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+
+        <footer class="footer">
+            <div class="footer-middle">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget widget-about">
+                                <img src="/assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105"
+                                    height="25">
+                                <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate
+                                    magna eros eu erat. </p>
+
+                                <div class="social-icons">
+                                    <a href="#" class="social-icon" target="_blank" title="Facebook"><i
+                                            class="icon-facebook-f"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Twitter"><i
+                                            class="icon-twitter"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Instagram"><i
+                                            class="icon-instagram"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Youtube"><i
+                                            class="icon-youtube"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Pinterest"><i
+                                            class="icon-pinterest"></i></a>
+                                </div><!-- End .soial-icons -->
+                            </div><!-- End .widget about-widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget">
+                                <h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
+
+                                <ul class="widget-list">
+                                    <li><a href="about.html">About Molla</a></li>
+                                    <li><a href="#">How to shop on Molla</a></li>
+                                    <li><a href="#">FAQ</a></li>
+                                    <li><a href="contact.html">Contact us</a></li>
+                                    <li><a href="login.html">Log in</a></li>
+                                </ul><!-- End .widget-list -->
+                            </div><!-- End .widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget">
+                                <h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
+
+                                <ul class="widget-list">
+                                    <li><a href="#">Payment Methods</a></li>
+                                    <li><a href="#">Money-back guarantee!</a></li>
+                                    <li><a href="#">Returns</a></li>
+                                    <li><a href="#">Shipping</a></li>
+                                    <li><a href="#">Terms and conditions</a></li>
+                                    <li><a href="#">Privacy Policy</a></li>
+                                </ul><!-- End .widget-list -->
+                            </div><!-- End .widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget">
+                                <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
+
+                                <ul class="widget-list">
+                                    <li><a href="#">Sign In</a></li>
+                                    <li><a href="cart.html">View Cart</a></li>
+                                    <li><a href="#">My Wishlist</a></li>
+                                    <li><a href="#">Track My Order</a></li>
+                                    <li><a href="#">Help</a></li>
+                                </ul><!-- End .widget-list -->
+                            </div><!-- End .widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+                    </div><!-- End .row -->
+                </div><!-- End .container -->
+            </div><!-- End .footer-middle -->
+
+            <div class="footer-bottom">
+                <div class="container">
+                    <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
+                    <!-- End .footer-copyright -->
+                    <figure class="footer-payments">
+                        <img src="/assets/images/payments.png" alt="Payment methods" width="272" height="20">
+                    </figure><!-- End .footer-payments -->
+                </div><!-- End .container -->
+            </div><!-- End .footer-bottom -->
+        </footer><!-- End .footer -->
+    </div><!-- End .page-wrapper -->
+    
+        
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.14.0/dist/sweetalert2.all.min.js"></script>
+    
+    <script>
+    $(document).ready(() => {
+        $(".click").click(() => {
+            $(".show").toggle(200);
+            $("#table").toggle(200);
+        })
+        $(".closeBtn").click(() => {
+            $(".show").toggle(200);
+            $("#table").toggle(200);
+            
+
+        })
+    })
+    </script>
+    
+
+        
+    <script>
+        function CancelConfirmation(event, pid) {
+          event.preventDefault(); // Prevent the default link behavior
+        
+          // Show a Swal confirmation pop-up
+          Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to cancel the order!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, Cancel it!",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // If the user confirms, proceed with the deletion
+              window.location.href = `/removeorder?id=${pid}`;
+              
+            }
+          });
+        }
+        </script> 
+    <script>
+   
+         function editpod(orderid,ordername){
+            document.querySelector('.id').value =orderid ;
+     document.querySelector('.ordername').value = ordername; 
+         }   
+        
+    
+    function editreturn(orderid,ordername) {
+     
+     document.querySelector('#id').value =orderid ;
+     document.querySelector('#ordername').value = ordername; 
+ }
+ 
+</script>
+
+<script>
+    $(document).ready(() => {
+        $(".return").click(() => {
+            $("#popup").toggle(200);
+            $("#table").toggle(200);
+        })
+        $("#close").click(() => {
+            $("#popup").toggle(200);
+            $("#table").toggle(200);
+            
+
+        })
+    })
+    </script>
+
+
+
+
+        
+    <%- include('footer.ejs') %>

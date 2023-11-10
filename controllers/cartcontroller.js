@@ -16,8 +16,24 @@ const crypto = require('crypto');
 const getCart = async function (req, res) {
   if (req.cookies.user) {
     let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-    const err = req.query.error
-    res.render('user/cart', { cart: cart ? cart.Products : null, error: err })
+
+    if(req.query.stock){
+      const sproduct = await products.findOne({_id: req.query.stock},{Productname:1})
+      const stock = true
+      res.render('user/cart', { cart: cart ? cart.Products : null, stock, sproduct , err:""})
+    }else{
+      res.render('user/cart', { cart: cart ? cart.Products : null, stock:"", sproduct:"" ,err:"" })
+
+    }
+
+    if(req.query.error){
+      const err = req.query.error
+      res.render('user/cart', { cart: cart ? cart.Products : null, err })
+    }else{
+      res.render('user/cart', { cart: cart ? cart.Products : null, err:"" })
+
+    }
+    
   } else {
     res.redirect('/sin?error=you have to login to use cart');
   }
@@ -69,12 +85,17 @@ const removecart = async function (req, res) {
 
 
 const addtocarthome = async function (req, res) {
+  try {
   console.log("hello");
   if (req.cookies.user) {
-    try {
       const product = await products.findById(req.params.pid);
       let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
 
+      if(product.Stoke<=1){
+        res.redirect('/?error=The product you are trying add to cart is out of stock')
+      }else{
+
+      
       if (cart) {
         const existingProduct = cart.Products.find(
           (item) => item.Productid.toString() === product._id.toString()
@@ -89,6 +110,7 @@ const addtocarthome = async function (req, res) {
             Productimg: product.Imagepath[0],
             Price: product.Price - product.Discount,
             Quantity: 1,
+            Stock:product.Stoke
           });
           await cart.save();
         }
@@ -107,6 +129,7 @@ const addtocarthome = async function (req, res) {
               Productimg: product.Imagepath[0],
               Price: product.Price - product.Discount,
               Quantity: 1,
+              Stock: product.Stoke
             },
           ],
         });
@@ -115,13 +138,13 @@ const addtocarthome = async function (req, res) {
       }
 
       res.redirect("/");
-
-    } catch (error) {
-      console.log("Cart saving error: ", error);
-      return res.status(500).json({ message: "Internal server error." });
     }
-  } else {
-    res.redirect('/sin?error=you have to login to use cart');
+    } else {
+      res.redirect('/sin?error=you have to login to use cart');
+    }
+  } catch (error) {
+    console.log("Cart saving error: ", error);
+    return res.status(500).json({ message: "Internal server error." });
   }
 }
 
@@ -129,25 +152,41 @@ const cartcheckout = async function (req, res) {
   const user = await userdatacopy.findById(req.cookies.user.id);
   const address = await useraddresscopy.findOne({ Userid: user._id });
   const cart = await cartModel.findOne({ Userid: user._id });
-  console.log(cart);
+
+  let id=[]
+  for(i=0 ;i<cart.Products.length;i++){
+
+    id.push(cart.Products[i].Productid)
+  }
+  let stockproduct = await products.find({_id:{$in:id}})
+for(i=0;i<stockproduct.length;i++){
+  if(stockproduct[i].Stoke-cart.Products[i].Quantity <1){
+    res.redirect(`/viewcart?stock=${stockproduct[i]._id}`);
+    break;
+  }
+}
+
+  console.log(id);
   if (cart.Products[0]) {
 
-    if(address){
+    if(address.PrimaryAddress.Name){
 
       res.render("user/checkout", {
         product: null,
         user: user,
         address: address,
         cart: cart.Products,
+        balance:""
   
       })
     }else{
       res.redirect('/dash?address="you have no address"')
+
     }
 
 
   } else {
-    res.redirect('/viewcart?error:you have no products')
+    res.redirect('/viewcart?error="you have no products"')
 
   }
 }

@@ -6,7 +6,7 @@
 
         <div class="row ">
             <div class="col-12 mt-4" style="display: flex; justify-content: space-between;">
-                <h5><a href="/dash" style="text-decoration: none; color: #000;"><button class="btn ">Back to Orders</button> </a></h5>
+                <h5><a href="/getorder" style="text-decoration: none; color: #000;"><button class="btn ">Back to Orders</button> </a></h5>
                 
                 </h5>
             </div>
@@ -14,6 +14,7 @@
                 <% order.Items.map((item)=>{ %>
                         <div class="gcard2 col-12 col-lg-12 mb-2">
                             <div class="shadow" style="width: 100%; display: flex; padding: 10px 20px; border-radius: 10px; justify-content: space-between;">
+                                
                                 
                                 <div class="gcard2-body p-3">
                                     <h6>
@@ -24,9 +25,13 @@
                                     <span>Shipping cost: ₹<%= order.Shippingcost %></span><br>
                                     <span>Total: ₹<%= item.Price + order.Shippingcost %></span>
                                 </div>
-                                <div class=""> 
-                                    <a  onclick="removeOrderItem('<%= item._id %>', '<%= order._id %>')"><button  style="background-color: rgb(163, 8, 8); color: white; outline: auto ">Return item</button></a>
+                                <div class="col-3 col-lg-3">
+                                    <img src="<%= item.Productimg %>">
                                 </div>
+                                    
+
+                                
+                                
                             </div>
                             
                         </div>
@@ -63,16 +68,17 @@
         <% } else { %>
             <div class="row ">
                 <div class="col-12 mt-4" style="display: flex; justify-content: space-between;">
-                    <h5><a href="/dash" style="text-decoration: none; color: #000;"><button class="btn ">Back to Orders</button> </a></h5>
+                    <h5><a href="/getorder" style="text-decoration: none; color: #000;"><button class="btn ">Back to Orders</button> </a></h5>
                     
                     </h5>
                 </div>
                 <div class="allProducts row col-12 mt-1">
                     <% order.Items.map((item)=>{ %>
+                        <a href="/productdetials/<%= item.Productid %>">
                             <div class="gcard2 col-12 col-lg-12 mb-2">
                                 <div class="shadow" style="width: 100%; display: flex; padding: 10px 20px; border-radius: 10px; justify-content: space-between;">
                                     
-                                    <div class="gcard2-body p-3">
+                                    <div class="gcard2-body p-3" >
                                         <h6>
                                             <%= item.Productname %>
                                         </h6>
@@ -81,16 +87,16 @@
                                         <span>Shipping cost: ₹<%= order.Shippingcost %></span><br>
                                         <span>Total: ₹<%= item.Price + order.Shippingcost %></span>
                                     </div>
-                                    <div class=""> 
-                                        <a  onclick="removeOrderItem('<%= item._id %>', '<%= order._id %>')"><button  style="background-color: rgb(163, 8, 8); color: white; outline: auto ">Return item</button></a>
+                                    <div class="col-6 col-lg-2" style="object-fit: contain;">
+                                        <img src="<%= item.Productimg %>">
                                     </div>
-                                </div>
                                 
                             </div>
                             
                         
+                        </div>
+                        </a>
                         <% }) %>
-                </div>
             </div>
             <div class="row">
                 <div class="col-12 mt-4" style="display: flex; justify-content: space-between;">
@@ -123,11 +129,13 @@
 
 
 
-<script>
+
+
+ <script>
     async function removeOrderItem(productId, orderId) {
         // AJAX request to update the quantity
-        const prompt = confirm('Are you sure you want to cancel the order?');
-        if (prompt) {
+        
+    
             $.ajax({
                 type: 'GET',
                 url: '/removeorderitem/' + productId + '/' + orderId,
@@ -142,10 +150,13 @@
                     location.reload();
                 }
             });
-        }
+        
+    
+    
+        
 
-    }
-</script>
+}
+</script> 
 
 
 

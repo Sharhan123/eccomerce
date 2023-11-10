@@ -1,5 +1,5 @@
 <%- include('header.ejs') %>
-<div class="page-wrapper">
+<div class="page-wrapper" >
 
     <main class="main">
         <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
@@ -27,13 +27,10 @@
                                         href="#tab-dashboard" role="tab" aria-controls="tab-dashboard"
                                         aria-selected="true">Dashboard</a>
                                 </li>
+                                
                                 <li class="nav-item">
-                                    <a class="nav-link" id="tab-orders-link" data-toggle="tab" href="#tab-orders"
-                                        role="tab" aria-controls="tab-orders" aria-selected="false">Orders</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="tab-downloads-link" data-toggle="tab" href="#tab-downloads"
-                                        role="tab" aria-controls="tab-downloads" aria-selected="false">Cancelled orders</a>
+                                    <a class="nav-link" id="tab-orders-link" data-toggle="tab" href="#tab-wallet"
+                                        role="tab" aria-controls="tab-orders" aria-selected="false">Wallet</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address"
@@ -42,6 +39,10 @@
                                 <li class="nav-item">
                                     <a class="nav-link" id="tab-account-link" data-toggle="tab" href="#tab-account"
                                         role="tab" aria-controls="tab-account" aria-selected="false">Account Details</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link"  href="/getcoupon"
+                                        >coupons</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="/logout">Sign Out</a>
@@ -77,126 +78,57 @@
 
 
 
-                                                             <div class="tab-pane fade" id="tab-orders" role="tabpanel"aria-labelledby="tab-orders-link">
+                                                             
+
+
+
+
+                                
+
+
+                                <div class="tab-pane fade" id="tab-wallet" role="tabpanel"aria-labelledby="tab-orders-link">
                                                             
-                                                                <div>
-                                                                    <% if(orders) { %>
-                                                                    <% orders.map((order)=>{ %>
-                                                                        <% if(order.Status==='delivered') { %>
+                                    <div>
+                                        <% if(userdata) { %>
 
-                                                                        
+                                            <div class="row mb-2 " id="main" style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px;  display: flex; justify-content: space-between; height: fit-content; align-items: center;">
+                                                <br>
+                                                <br>
+                                                <span class="col-12 col-lg-6" style="color: blue; display: flex; justify-content: space-between;">
+                                                   <h6>Account Name : <%= userdata.username %></h6>
+                                                   
+                                                  
+                                                </span>
+                                                <span class="col-12 col-lg-6" style="color: blue; display: flex; justify-content: space-between;">
+                                                    <h6 style="color: brown;">  Email : <%= userdata.email %></h6>
+                                                    
+                                                   
+                                                 </span>
+                                                 <span class="col-12  col-lg-6" style="color: blue; display: flex; justify-content: space-between; align-items: center;" >
+                                                   
+                                                    <h5 style="color: rgb(0, 0, 0);"> Total Balance :  ₹ <%= userdata.Wallet %></h5>
+                                                 </span>
 
-                                                                            <div class="row mb-2 " id="main" style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px;  display: flex; justify-content: space-between; height: fit-content;">
-                                                                                <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
-                                                                                   <p>ordered on : <%= order.Orderdate.toDateString() %></p>
-                                                                                   <p style="color: brown;">  Ordered for : <%= order.Username %></p>
-                                                                                  <p style=" color: green; ">Delivered on : <%
-                                                                                        let fdate=new Date(order.Orderdate);
-                                                                                        fdate.setDate(fdate.getDate()+3) %>
-                                                                                        <%= fdate.toDateString() %></p>
-                                                                                </span>
-                                                                                
-                                                                                 <span class="col-12" style="color: blue; display: flex; justify-content: space-between; align-items: center;" >
-                                                                                   
-                                                                                    <h6 style="color: rgb(3, 133, 46);"> Status : <%= order.Status %></h6>
-                                                                                    
-    
-                                                                                  
-                                                                                    <a href="/vieworder?id=<%= order._id %>"><button class="btn btn-primary openEditBtn" >view details</button></a>
-                                                                                    
-                                                                                    <button class="btn btn-danger">Return order</button>
-                                                                                    
-                                                                                 </span>
-                                                                                 <br>
-                                                                                
-                                                                          
-                                                                            </div>
-                                                                        <% } else { %>
-                                                                            <div class="row mb-2 " id="main" style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px;  display: flex; justify-content: space-between; height: fit-content;">
-                                                                                <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
-                                                                                   <p>ordered on : <%= order.Orderdate.toDateString() %></p>
-                                                                                   <p style="color: brown;">  Ordered for : <%= order.Username %></p>
-                                                                                  <p style=" color: green; ">Arriving: <%
-                                                                                        let fdate=new Date(order.Orderdate);
-                                                                                        fdate.setDate(fdate.getDate()+3) %>
-                                                                                        <%= fdate.toDateString() %></p>
-                                                                                </span>
-                                                                                <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
-                                                                                    <p>Delivery address : <br> <%= order.Deliveryaddress.cname %> <br>  <%= order.Deliveryaddress.landmark %>,<%= order.Deliveryaddress.streetaddress %> <br> <%= order.Deliveryaddress.city %>,<%= order.Deliveryaddress.state %><br><%= order.Deliveryaddress.pincode %> </p>
-                                                                                    <p style="color: brown; text-align: start;">  Items : <%= order.Items.length %> <br>
-                                                                                        Shipping cost : <%= order.Shippingcost %><br>
-                                                                                    Total  : ₹<%= order.Totalamount %></p>
-                                                                                   <p style=" color: green; "> 
-                                                                                   </p>
-                                                                                 </span>
-                                                                                 <span class="col-12" style="color: blue; display: flex; justify-content: space-between; align-items: center;" >
-                                                                                   
-                                                                                    <p style="color: blue;"> Status : <%= order.Status %></p>
-                                                                                    
-    
-                                                                                  
-                                                                                    <a href="/vieworder?id=<%= order._id %>"><button class="btn btn-primary openEditBtn" >view details</button></a>
-                                                                                    
-                                                                                    <button class="btn btn-danger"  onclick="removeOrderItem('<%= order._id %>')" >Cancel order</button>
-                                                                                    
-                                                                                 </span>
-                                                                                 <br>
-                                                                                
-                                                                          
-                                                                            </div>
-                                                                            <% } %>
-
-
-                                                                        
-                                                                        <% }) %>
-                                                                        <% }else{  %>
-                                                                            
-                                                                            
-
-                                                                        <% } %>
-                                                                </div>
-                                                                
-                                                        </div><!-- .End .tab-pane -->
-
-
-
-
-                                <div class="tab-pane fade" id="tab-downloads" role="tabpanel"
-                                    aria-labelledby="tab-downloads-link">
-                                    <% if(cancel){ %>
-                                        <% cancel.map((order)=>{ %>
-                                        <div class="row mb-2 " id="main" style="background-color: rgba(233, 233, 233, 0.713); border-radius: 10px;  display: flex; justify-content: space-between; height: fit-content;">
-                                            <span class="col-12" style="color: blue; display: flex; justify-content: space-between;">
-                                               <p>ordered on : <%= order.Orderdate.toDateString() %></p>
-                                               <p style="color: rgb(42, 42, 165);">  Ordered for : <%= order.Username %></p>
-                                              <p style=" color: green; ">Ordered on : <%
-                                                    let fdate=new Date(order.Orderdate);
-                                                    fdate.setDate(fdate.getDate()+3) %>
-                                                    <%= fdate.toDateString() %></p>
-                                            </span>
-                                            
-                                             <span class="col-12" style="color: blue; display: flex; justify-content: space-between; align-items: center;" >
-                                               
-                                                <h6 style="color: rgb(222, 5, 5);"> Status : <%= order.Status %></h6>
+                                                 <span class="col-12  col-lg-6" style="color: blue; display: flex; justify-content: space-between; align-items: center;" >
+                                                   
+                                                    <h5 style="color: rgb(0, 0, 0);"> Transactions :   <%= userdata.WalletHistory.length %></h5>
+                                                 </span>
+                                                 <br>
+                                                 <br>
+                                                 <br>
                                                 
+                                                 
+                                          
+                                            </div>
 
-                                              
-                                                <a href="/vieworder?id=<%= order._id %>"><button class="btn btn-primary openEditBtn" >view details</button></a>
-                                                
-                                                <button class="btn btn-danger" onclick="reorder('<%= order._id %>')">Re Order</button>
-                                                
-                                             </span>
-                                             <br>
-                                            
-                                      
-                                        </div>
-                                        <% }) %>
-                                        <% }else{ %>
-                                    <p>No orders available yet.</p>
-                                    <a href="category.html" class="btn btn-outline-primary-2"><span>GO SHOP</span><i
-                                            class="icon-long-arrow-right"></i></a>
                                             <% } %>
-                                </div><!-- .End .tab-pane -->
+
+                                           <a href="/viewwallet" ><button  class="btn btn-primary">View Transactions</button></a>
+
+                                    </div>
+                                    
+                            </div>
+                                
 
                                 <!-- Primary Address form -->
                                 <div class="modal fade" id="address-modal-1" tabindex="-1" role="dialog" aria-hidden="true">
@@ -221,33 +153,33 @@
                                                                 <form action="/primaryaddress" method="post">
                                                                     <div class="mb-3">
                                                                         <label class="form-label">Name</label>
-                                                                        <input type="text" class="form-control" name="name" value="<%= address?address.PrimaryAddress.Name:'' %>">
+                                                                        <input type="text" class="form-control" name="name" value="<%= address?address.PrimaryAddress.Name:'' %>" required>
                                                                       </div>
 
                                                                     <div class="mb-3">
                                                                       <label class="form-label">Country</label>
-                                                                      <input type="text" class="form-control" name="country" value="<%= address?address.PrimaryAddress.Country:'' %>">
+                                                                      <input type="text" class="form-control" name="country" value="<%= address?address.PrimaryAddress.Country:'' %>" required>
                                                                     </div>
                                                                     <div class="mb-3">
                                                                       <label class="form-label">state</label>
-                                                                      <input type="text" class="form-control" name="state" value="<%= address?address.PrimaryAddress.States:'' %>">
+                                                                      <input type="text" class="form-control" name="state" value="<%= address?address.PrimaryAddress.States:'' %>" required>
                                                                     </div>
                                                                     <div class="mb-3">
                                                                       <label class="form-label">city</label>
-                                                                      <input type="text" class="form-control" name="city" value="<%= address?address.PrimaryAddress.City:'' %>">
+                                                                      <input type="text" class="form-control" name="city" value="<%= address?address.PrimaryAddress.City:'' %>" required>
                                                                     </div>
                                                                     <div class="mb-3">
                                                                       <label class="form-label">landmark</label>
-                                                                      <input type="text" class="form-control" name="landmark" value="<%= address?address.PrimaryAddress.Landmark:'' %>">
+                                                                      <input type="text" class="form-control" name="landmark" value="<%= address?address.PrimaryAddress.Landmark:'' %>" required> 
                                                                     </div>
                                                                     <div class="mb-3">
                                                                       <label class="form-label">pincode</label>
-                                                                      <input type="text" class="form-control" name="pincode" value="<%= address?address.PrimaryAddress.Pincode:'' %>">
+                                                                      <input type="text" class="form-control" name="pincode" value="<%= address?address.PrimaryAddress.Pincode:'' %>" required>
                                                                     </div>
 
                                                                     <div class="mb-3">
                                                                       <label class="form-label">Phone</label>
-                                                                      <input type="text" class="form-control" name="phone" value="<%= address?address.PrimaryAddress.Phone:'' %>">
+                                                                      <input type="text" class="form-control" name="phone" value="<%= address?address.PrimaryAddress.Phone:'' %>" required>
                                                                     </div>
 
                                                                     <button type="submit" class="btn btn-primary">Save it</button>
@@ -272,7 +204,7 @@
                                             <div class="card card-dashboard">
                                                 <div class="card-body">
                                                     <h3 class="card-title">Primary Address</h3><!-- End .card-title -->
-                                                    <% if(address){ %>
+                                                    <% if(address.PrimaryAddress){ %>
                                                     <%= address.PrimaryAddress.Name %><br>
                                                     <%= address.PrimaryAddress.City %>,
                                                     <%= address.PrimaryAddress.States %><br> 
@@ -283,7 +215,11 @@
                                                         <% } else { %>
                                                             You have not set up this type of address yet.
                                                         <% } %>
-                                                        <a href="#address-modal-1" data-toggle="modal">Change <i class="icon-edit"></i></a>
+                                                        <% if(cookies) { %>
+                                                            <a href="#address-modal-1" data-toggle="modal">Change <i class="icon-edit"></i></a>
+                                                            <% } %>
+
+                                                        
                                                     </p>
                                                 </div><!-- End .card-body -->
                                             </div><!-- End .card-dashboard -->
@@ -358,7 +294,7 @@
                                             <div class="card card-dashboard">
                                                 <div class="card-body">
                                                     <h3 class="card-title">Secondary Address</h3><!-- End .card-title -->
-                                                    <% if(address){ %>
+                                                    <% if(address.SecondaryAddress ){ %>
                                                         <p>
                                                             <%= address.SecondaryAddress.Name %>
                                                             <%= address.SecondaryAddress.City %>, 
@@ -371,7 +307,9 @@
                                                             <% } else { %>
                                                                 You have not set up this type of address yet.
                                                             <% } %>
+                                                            <% if(cookies) { %>
                                                             <a href="#address-modal-2" data-toggle="modal">Change <i class="icon-edit"></i></a>
+                                                            <% } %>
                                                         </p>
                                                 </div><!-- End .card-body -->
                                             </div><!-- End .card-dashboard -->
@@ -437,7 +375,7 @@
             </div><!-- End .dashboard -->
         </div><!-- End .page-content -->
     </main><!-- End .main -->
-
+    
     <%- include('footer.ejs') %>
 
 </div><!-- End .page-wrapper -->
@@ -648,77 +586,13 @@
     </script>
     <% } %>
 
-
-
-<script>
-    async function removeOrderItem( orderId) {
-        // AJAX request to update the quantity
-        const prompt = confirm('Are you sure you want to cancel the order?');
-        if (prompt) {
-            $.ajax({
-                type: 'GET',
-                url: '/removeorder/'+ orderId,
-                success: function (response) {
-                    console.log('Order Item Removed successfully:', response);
-                    // Update the total price and any other UI elements as needed
-                    // For simplicity, let's reload the page to update the UI after quantity change
-                    location.reload();
-                },
-                error: function (error) {
-                    console.error('Error removing order item:', error);
-                    location.reload();
-                }
-            });
-        }
-
-    }
-</script>
-<script>
-    async function reorder( orderId) {
-        // AJAX request to update the quantity
-        const prompt = confirm('Are you sure you want to reorder the order?');
-        if (prompt) {
-            $.ajax({
-                type: 'GET',
-                url: '/reorder/'+ orderId,
-                success: function (response) {
-                    console.log('Order Item Removed successfully:', response);
-                    // Update the total price and any other UI elements as needed
-                    // For simplicity, let's reload the page to update the UI after quantity change
-                    location.reload();
-                },
-                error: function (error) {
-                    console.error('Error removing order item:', error);
-                    location.reload();
-                }
-            });
-        }
-
-    }
-</script>
-<script>
-    let productid;
-    let orderid
     
-    function editClick(product) {
-        let edate=new Date(product.orderdate);
-   edate.setDate(edate.getDate()+3) 
-     let date= edate.toDateString() 
-     let price= product.quantity* product.price
-        productid = product.pid;
-        orderid = product.oid
-        document.getElementById('name').value = product.productname;
-        document.getElementById('price').value = price;
-        document.getElementById('qty').value = product.quantity;
-        document.getElementById('date').value = product.orderdate;
-        document.getElementById('img').value = product.productimg;
-        document.getElementById('arrive').value = date;
-        document.getElementById('main').style.display = 'none';
-  document.getElementById('sub').style.display = 'block';
-        
-    }
-    
-        </script>
+
+   
+
+
+
+
 
 
 

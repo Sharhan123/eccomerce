@@ -17,6 +17,7 @@ const uschema= new mongoose.Schema(
         gender:{
             type:String,
         },
+        
         dob:{
             type:Date
         },
@@ -27,9 +28,32 @@ const uschema= new mongoose.Schema(
         Blocked:{
             type:Boolean,
             required:true,
-        }
+        },
+        Wallet:{
+            type:Number,
+            default:0,
+        },
+        WalletHistory:[
+            {
+                Date:{
+                    type:Date,
+
+                },
+                Amount:{
+                    type:Number,
+                },
+                Description:{
+                    type:String,
+                },
+                Status:{
+                    type:String,
+                    enum: [ 'Debited', 'Credited'  ] 
+                }
+            }
+        ]
             
     
 })
 
 module.exports=mongoose.model('user',uschema);
+

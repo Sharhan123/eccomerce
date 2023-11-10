@@ -7,7 +7,7 @@ const ProductsSchema = new Schema({
   Productname: { type: String, required: true },
   Spec: { type: String, required: true },
   Dateadded: { type: Date, required: true },
-  Category: { type: String, required: true },
+  Category: { type: Schema.Types.ObjectId, ref: 'catagory',required: true },
   Price: { type: Number, required: true },
   Discount: { type: Number },
   Shipingcost: { type: Number },

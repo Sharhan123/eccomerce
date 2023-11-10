@@ -9,10 +9,11 @@ const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp")
 const catagory = require("../model/catagory");
-
+const coupons = require('../model/coupon')
 const Orders = require("../model/orders");
 const Banner = require("../model/banner");
 const { Console } = require("console");
+const coupon = require("../model/coupon");
 
 const getadmin = async function (req, res) {
     res.render("admn/login", { error: "" });
@@ -40,7 +41,7 @@ const getadmin = async function (req, res) {
       let acount = await Orders.countDocuments({ Status: 'active' })
       let ccount = await Orders.countDocuments({ Status: 'Cancelled' })
       let user = await Usercopy.countDocuments()
-      
+      let ordercount = await Orders.countDocuments()
       let cod = await Orders.countDocuments({
         Items: {
           $elemMatch: {
@@ -83,7 +84,7 @@ const getadmin = async function (req, res) {
       
      
   
-      res.render('admn/dash', {  cod, pod, wallet, count, total, acount, ccount, user, pro ,percentage})
+      res.render('admn/dash', {  cod, pod, wallet, count, total, acount, ccount, user, pro ,percentage,ordercount})
     } catch (err) {
       console.log(err)
     }
@@ -100,10 +101,18 @@ res.redirect('/')
 
 
   const getproducts = async function (req, res) {
-    const product = await Product.find({});
+    try{
+
+    
+      const product = await Product.find({}).populate('Category')
+      
     const catagry = await catagory.find({})
     res.render("admn/products", { product, pid: product._id, catagory: catagry })
-  }
+  } catch(err){
+    console.log("error");
+    console.log(err);
+  } 
+}
 
 
   const addproduct = async function (req, res) {
@@ -117,14 +126,15 @@ res.redirect('/')
         imagePaths.push(imagePath);
   
       }
-  
+
+      const categoryid = await catagory.findOne({catagory:req.body.category})
   
       // Create a new product entry with the image paths
       const newProduct = new Product({
         Description: req.body.desc,
         Productname: req.body.pname,
         Spec: req.body.specs,
-        Category: req.body.category,
+        Category: categoryid,
         Price: req.body.price,
         Discount: req.body.discount,
         Shipingcost: req.body.scost,
@@ -179,7 +189,6 @@ res.redirect('/')
       Description: req.body.desc,
       Productname: req.body.pname,
       Spec: req.body.specs,
-      Category: req.body.category,
       Price: req.body.price,
       Discount: req.body.discount,
       Shipingcost: req.body.scost,
@@ -395,6 +404,74 @@ res.redirect('/')
   
   
   }
+
+
+  const getcoupon= async (req, res) => {
+
+    const coupon= await coupons.find({})
+    res.render('admn/coupon',{coupon})
+  }
+
+
+  const addcoupon = async (req, res) => {
+
+    const {code,adate,edate,amount,discount,limit}=req.body
+    const newcat = new coupon({
+      couponcode:code,
+      activationdate:adate,
+      expirydate:edate,
+      criteriaamount:amount,
+      discountamount:discount,
+      userslimit:limit
+
+    })
+    await newcat.save()
+    
+    res.redirect('/getadmin/coupon')
+  }
+
+
+
+  const deletecoupon = async function(req,res){
+    try{
+
+      const id= req.params.id
+
+      if(id){
+        await coupon.findOneAndRemove({_id:id})
+      }
+      res.redirect('/getadmin/coupon')
+
+    } catch(err){
+
+    }
+  }
+
+
+  const editcoupon = async function(req,res){
+    try{
+
+      const id = req.params.id
+
+      const {code,adate,edate,camount,damount,limit}= req.body
+
+      const data={
+        couponcode:code,
+        activationdate:adate,
+        expirydate:edate,
+        discountamount:damount,
+        criteriaamount:camount,
+        userslimit:limit
+      }
+await coupon.updateOne({_id:id},{$set:data})
+res.redirect('/getadmin/coupon')
+
+    } catch(err){
+      console.log(err);
+
+    }
+  }
+
   module.exports={
     getadmin,
     postadmin,
@@ -418,5 +495,9 @@ res.redirect('/')
     unblockuser,
     getbanner,
     addbanner,
-    logout
+    logout,
+    getcoupon,
+    addcoupon,
+    deletecoupon,
+    editcoupon 
   }

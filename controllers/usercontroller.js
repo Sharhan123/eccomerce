@@ -11,7 +11,7 @@ const catagory = require('../model/catagory')
 const helper = require('../helpers/paymenthelper')
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
-
+const wishlistmodel = require('../model/whishlist') 
 
 const { errorMonitor } = require('nodemailer/lib/xoauth2');
 const ban = require('../model/banner');
@@ -45,11 +45,20 @@ const gethome = async function (req, res) {
   const cata = await catagory.find({})
   const banner = await ban.find({})
   if (req.cookies.user) {
-    let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
 
-    res.render('user/home', { cookie: req.cookies.user, product, cart: cart ? cart.Products : null, cata, banner });
+    let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
+    let wishlist = await wishlistmodel.findOne({Userid: req.cookies.user.id})
+    if(req.query.error){
+     const error = req.query.error
+    let wishlist = await wishlistmodel.findOne({Userid: req.cookies.user.id})
+    res.render('user/home', { cookie: req.cookies.user, product, cart: cart ? cart.Products : null, cata, banner ,error ,wishlist});
+
+    }else{
+      res.render('user/home', { cookie: req.cookies.user, product, cart: cart ? cart.Products : null, cata, banner ,error:"", wishlist});
+
+    }
   } else {
-    res.render('user/home', { cookie: req.cookies.user, product, cata, banner });
+    res.render('user/home', { cookie: req.cookies.user, product, cata, banner ,error:"",wishlist:""});
   }
 }
 
@@ -224,39 +233,59 @@ const getlogout = async function (req, res) {
 
 
 const getprofile = async function (req, res) {
-  if (req.cookies.user) {
-    userid = req.cookies.user.id
+  try {
+    if (req.cookies.user) {
+      const userid = req.cookies.user.id;
 
-    let aerror
-    
-    const orders = await Orders.find({
-      Userid: userid,
-      Status: { $in: ["active", "delivered", "shipped"] }
-    });
-    const cancel = await Orders.find({ Userid: userid, Status: { $in: 'Cancelled' } })
-    
-    const address = await useraddresscopy.findOne({ Userid: req.cookies.user.id });
-    const pdata = await userdatacopy.findOne({ email: req.cookies.user.email }).then((data) => {
-      return {
-        name: data.username,
-        email: data.email,
-        dob: data.dob,
-        gender: data.gender,
-        
+      const orders = await Orders.find({
+        Userid: userid,
+        Status: { $in: ["active", "delivered", "shipped"] }
+      });
+      const cancel = await Orders.find({ Userid: userid, Status: { $in: ['Cancelled', 'Returned'] } });
+      const userdata = await userdatacopy.findOne({ _id: userid });
+      const address = await useraddresscopy.findOne({ Userid: req.cookies.user.id });
+      const pdata = await userdatacopy.findOne({ email: req.cookies.user.email });
+
+      let aerror = "";
+      let cancelid = "";
+
+      if (req.query.cancel) {
+        cancelid = req.query.cancel;
       }
-    })
-    if(req.query.address){
-      aerror = req.query.address
-      console.log("yes");
-    res.render('user/profile', { cookies: pdata, address: address, error: req.query.error, orders, cancel ,aerror })
-  }else{
-    res.render('user/profile', { cookies: pdata, address: address, error: req.query.error, orders, cancel ,aerror:"" })
 
+      if (req.query.address) {
+        aerror = req.query.address;
+      }
+
+      res.render('user/profile', {
+        cookies: pdata,
+        address: address,
+        error: req.query.error,
+        orders,
+        cancel,
+        aerror,
+        userdata,
+        cancelid
+      });
+    } else {
+      res.render('user/profile', {
+        cookies: "",
+        address: "",
+        error: req.query.error,
+        orders: "",
+        cancel: "",
+        aerror: "",
+        userdata: "",
+        cancelid: ""
+      });
+    }
+  } catch (error) {
+    // Handle any errors here, e.g., log the error or send an error response.
+    console.error(error);
+    res.status(500).send("Internal Server Error");
   }
-  } else {
-    res.render('user/profile', { cookies: "", address: "", error: req.query.error, orders: "", cancel: "" })
-  }
-}
+};
+
 
 
 
@@ -358,12 +387,30 @@ const checkout = async function (req, res) {
     const product = await products.findById(pid);
     const user = await userdatacopy.findById(req.cookies.user.id);
     const address = await useraddresscopy.findOne({ Userid: user._id });
-    res.render("user/checkout", {
-      product: product,
-      user: user,
-      address: address,
-    });
+
+    
+    
+    if(req.query.balance){
+      let balance = req.query.balance
+      res.render("user/checkout", {
+        product: product,
+        user: user,
+        address: address,
+        balance
+      });
+    }else{
+
+      res.render("user/checkout", {
+        product: product,
+        user: user,
+        address: address,
+        balance:""
+      });
+    }
+  
+    
   }
+
 
 }
 
@@ -381,7 +428,9 @@ const checkout = async function (req, res) {
 
 
 
+
 const getshop = async function (req, res, next) {
+  try{
   let search = req.query.search
   let name = req.query.name
   let categories = req.query.categories
@@ -392,8 +441,8 @@ const getshop = async function (req, res, next) {
   console.log(price);
   if (categories) {
     // If multiple categories are passed, split them into an array
-    const categoryArray = categories.split(',');
-
+    let categoryArray = categories.split(',');
+    let id = await catagory.find({catagory:{$in:categoryArray}})
     if (categoryArray.length === 1) {
       // If there is only one category, use it
       catagry = categoryArray[0];
@@ -404,6 +453,7 @@ const getshop = async function (req, res, next) {
   }
   if (name) {
 
+const cname = await catagory.findOne({catagory:name})
     if (price) {
       const cata = await catagory.find({})
       const page = parseInt(req.query.page) || 1;
@@ -415,7 +465,7 @@ const getshop = async function (req, res, next) {
 
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-
+        let wishlist = await wishlistmodel.findOne({userid:req.cookies.user.id})
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -425,7 +475,8 @@ const getshop = async function (req, res, next) {
           cata,
           name,
           search: "",
-          price
+          price,
+          wishlist
         });
       } else {
         res.render('user/shop', {
@@ -436,7 +487,8 @@ const getshop = async function (req, res, next) {
           cata,
           name,
           search: "",
-          price
+          price,
+          wishlist:""
         });
       }
     } else {
@@ -450,7 +502,7 @@ const getshop = async function (req, res, next) {
 
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-
+        let wishlist = await wishlistmodel.findOne({userid:req.cookies.user.id})
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -460,7 +512,8 @@ const getshop = async function (req, res, next) {
           cata,
           name,
           search: "",
-          price: ""
+          price: "",
+          wishlist
         });
       } else {
         res.render('user/shop', {
@@ -471,7 +524,8 @@ const getshop = async function (req, res, next) {
           cata,
           name,
           search: "",
-          price: ""
+          price: "",
+          wishlist:""
         });
       }
     }
@@ -493,7 +547,7 @@ const getshop = async function (req, res, next) {
 
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-
+        let wishlist = await wishlistmodel.findOne({userid:req.cookies.user.id})
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -505,7 +559,8 @@ const getshop = async function (req, res, next) {
           name: "",
           search: "",
           price,
-          max
+          max,
+          wishlist
         });
       } else {
         res.render('user/shop', {
@@ -519,6 +574,7 @@ const getshop = async function (req, res, next) {
           search: "",
           price,
           max,
+          wishlist:""
         });
       }
 
@@ -534,7 +590,7 @@ const getshop = async function (req, res, next) {
 
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-
+        let wishlist = await wishlistmodel.findOne({userid:req.cookies.user.id})
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -546,7 +602,8 @@ const getshop = async function (req, res, next) {
           name: "",
           search: "",
           price: "",
-          max
+          max,
+          wishlist
         });
       } else {
         res.render('user/shop', {
@@ -559,7 +616,8 @@ const getshop = async function (req, res, next) {
           name: "",
           search: "",
           price: "",
-          max
+          max,
+          wishlist:""
         });
       }
     }
@@ -594,7 +652,7 @@ const getshop = async function (req, res, next) {
 
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-
+        let wishlist = await wishlistmodel.findOne({userid:req.cookies.user.id})
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -606,7 +664,8 @@ const getshop = async function (req, res, next) {
           categories: "",
           search,
           price,
-          max
+          max,
+          wishlist
         });
       } else {
         res.render('user/shop', {
@@ -619,7 +678,8 @@ const getshop = async function (req, res, next) {
           categories: "",
           search,
           price,
-          max
+          max,
+          wishlist:""
         });
       }
     } else {
@@ -651,7 +711,7 @@ const getshop = async function (req, res, next) {
 
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-
+        let wishlist = await wishlistmodel.findOne({userid:req.cookies.user.id})
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -663,7 +723,8 @@ const getshop = async function (req, res, next) {
           categories: "",
           search,
           price: "",
-          max
+          max,
+          wishlist
         });
       } else {
         res.render('user/shop', {
@@ -676,7 +737,8 @@ const getshop = async function (req, res, next) {
           categories: "",
           search,
           price: "",
-          max
+          max,
+          wishlist:""
         });
       }
     }
@@ -697,7 +759,7 @@ const getshop = async function (req, res, next) {
       const totalpages = Math.ceil(count / productsPerPage)
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-
+        let wishlist = await wishlistmodel.findOne({userid:req.cookies.user.id})
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -709,7 +771,8 @@ const getshop = async function (req, res, next) {
           categories: "",
           search: "",
           price,
-          max
+          max,
+          wishlist
         });
       } else {
         res.render('user/shop', {
@@ -722,7 +785,8 @@ const getshop = async function (req, res, next) {
           categories: "",
           search: "",
           price,
-          max
+          max,
+          wishlist:""
         });
       }
 
@@ -743,7 +807,7 @@ const getshop = async function (req, res, next) {
       const totalpages = Math.ceil(count / productsPerPage)
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
-
+        let wishlist = await wishlistmodel.findOne({userid:req.cookies.user.id})
         res.render('user/shop', {
           cookie: req.cookies.user,
           product,
@@ -755,7 +819,8 @@ const getshop = async function (req, res, next) {
           categories: "",
           search: "",
           price: "",
-          max
+          max,
+          wishlist
         });
       } else {
         res.render('user/shop', {
@@ -768,11 +833,17 @@ const getshop = async function (req, res, next) {
           categories: "",
           search: "",
           price: "",
-          max
+          max,
+          wishlist:""
         });
       }
     }
   }
+} catch (err) {
+  
+  console.log(err);
+  
+}
 }
 
 

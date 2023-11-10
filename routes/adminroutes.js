@@ -40,4 +40,11 @@ router.get('/unblockuser/:email',auth.islogin,admincontroller.unblockuser)
 
 router.get('/banner',auth.islogin,admincontroller.getbanner)
 router.post('/addbanner',multer.upload.array("images", 1),admincontroller.addbanner)
+
+
+
+router.get('/coupon',auth.islogin,admincontroller.getcoupon)
+router.post('/addcoupon',admincontroller.addcoupon)
+router.get('/deletecoupon/:id',auth.islogin,admincontroller.deletecoupon)
+router.post('/editcoupon/:id',auth.islogin,admincontroller.editcoupon)
 module.exports=router;

@@ -19,13 +19,54 @@
         <div class="page-content">
             <div class="checkout">
                 <div class="container">
-                    <div class="checkout-discount">
-                        <form action="#">
-                            <input type="text" class="form-control" required id="checkout-discount-input">
-                            <label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click here to enter your code</span></label>
-                        </form>
-                    </div><!-- End .checkout-discount -->
+                    <div class="cart-discount">
+                                       
+                        <div >
+                            <label for="checkout-discount-input" class="text-truncate"
+                              >Have a coupon? <span>Enter your code below.</span></label
+                            >
+                          </div>
+                          <div class="cart-discount">
+                            
+                              <div class="input-group mb-5">
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  required
+                                  name="code"
+                                  id="code"
+                                  placeholder="coupon code"
+                                  style="
+                                    height: 40px;
+                                    border: 1px dotted #000;
+                                    padding-left: 10px;
+                                  "
+                                />
+                                
+                                <button
+                                id="unApply"
+                                  class="btn btn-outline-dark"
+                                  style="margin: 0; width: 70px; height: 40px; display: none;"
+                                  onclick="unApplycoupon($('#code').val())"
+                                >
+                                  <i class="fas fa-trash"></i>
+                                </button>
+                                
+                                  <button
+                                  id="apply"
+                                  class="btn btn-outline-dark"
+                                  style="margin: 0; width: 70px; height: 40px"
+                                  onclick="applycoupon($('#code').val())"
+                                >
+                                  <i class="icon-long-arrow-right"></i>
+                                </button>
+                                <input type="text" id="couponcode" value=""  style="display: none;">
+                              </div>
+                          </div>
+                </div>
                     <form   id="the-checkout-form">
+                    <!-- End .checkout-discount -->
+                    
                         <div class="row">
                             <div class="col-lg-9">
                                 <h2 class="checkout-title">Billing Details</h2><!-- End .checkout-title -->
@@ -146,15 +187,27 @@
                                             <% } %>
                                             <tr class="summary-subtotal">
                                                 <td>Subtotal:</td>
-                                                <td>₹<%= subtotal %></td>
+                                                <td id="subtotal"><%= subtotal %></td>
                                             </tr><!-- End .summary-subtotal -->
                                             <tr>
                                                 <td>Shipping:</td>
                                                 <td>Free shipping</td>
                                             </tr>
+                                            <tr id="appliedBadge" style="display: none;">
+                                                <td>Coupon Applied</td>
+                                                <td> <i class="fa-solid fa-badge-check" style="font-size: large;" ></i></td>
+                                               
+                                              </tr>
+                          
+                                              <tr class="summary-subtotal" id="disCol" style="display: none;">
+                                                <td> Discount Amount:</td>
+                                                <td id="discount" ></td>
+                                              </tr>
+
                                             <tr class="summary-total">
-                                                <td>Total:</td>
-                                                <td id="total">₹<%= subtotal %></td>
+                                                <td>Total: </td>
+                                                <td id="total">₹ <%= subtotal %></td>
+                                               
                                             </tr><!-- End .summary-total -->
                                         </tbody>
                                     </table><!-- End .table table-summary -->
@@ -162,7 +215,21 @@
                                     <div class="accordion-summary" id="accordion-payment">
                                         <!-- End .card -->
 
-                                       
+                                        <div class="card">
+                                            <div class="card-header" id="heading-3">
+                                                <h2 class="card-title">
+                                                    <label for="payment-method-cash">
+                                                        <input type="radio" id="payment-method-cash" name="payment" class="payment-method-radio" value="wallet" required>
+                                                        wallet
+                                                    </label>
+                                                </h2>
+                                            </div><!-- End .card-header -->
+                                            <div id="collapse-3" class="collapse" aria-labelledby="heading-3" data-parent="#accordion-payment">
+                                                <div class="card-body">
+                                                    
+                                                </div><!-- End .card-body -->
+                                            </div><!-- End .collapse -->
+                                        </div>
                                         
                                         <div class="card">
                                             <div class="card-header" id="heading-3">
@@ -288,6 +355,113 @@
         </div><!-- End .footer-bottom -->
     </footer><!-- End .footer -->
 </div><!-- End .page-wrapper -->
+<% if(balance){ %>
+    <script>
+    Swal.fire({
+      title: "error",
+      text: "You have insufficient balance in wallet",
+      icon: "error",
+      confirmButtonText: "OK"
+    });
+    </script>
+    <% } %>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+function unApplycoupon(code) {
+    const amount = document.getElementById('subtotal').innerHTML;
+    $.ajax({
+      url: "/deleteAppliedCoupon",
+      data:{
+        code:code,
+        amount: amount
+      },
+      method: "post",
+      success: (response)=>{
+        if(response.success){
+          document.getElementById('total').innerHTML = response.disTotal
+          document.getElementById('subtotal').innerHTML = response.disTotal
+          document.getElementById('apply').style.display = "block"
+          document.getElementById('unApply').style.display = "none"
+          document.getElementById('disCol').style.display = "none"
+          document.getElementById('appliedBadge').style.display = "none"
+          document.getElementById('code').value=""
+          document.getElementById('couponcode').value=""
+
+          Swal.fire({
+            icon: 'warning',
+            title: 'Deleted !!',
+            text: 'Applied coupon is deleted.'
+          })
+        }
+      }
+    })
+  }
+
+
+
+
+
+
+
+        function applycoupon(code) {
+            
+            const amount = document.getElementById('subtotal').innerHTML;
+           
+            
+            $.ajax({
+              url: "/applycoupon",
+              data: {
+                code: code,
+                amount: amount
+              },
+              method: "post",
+              success: (response) => {
+                if (response.user) {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops !!',
+                    text: 'This coupon already used!'
+                  })
+                }else if (response.cartAmount) {
+                  Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops !!',
+                    text: 'You cant use the coupon...Buy more'
+                  })
+                } else if (response.amountOkey) {
+                 
+                  document.getElementById('total').innerHTML= "₹ "+response.disTotal 
+                  
+                
+                  document.getElementById('subtotal').innerHTML = "₹ "+response.disTotal
+                  document.getElementById('discount').innerHTML = "₹ "+response.disAmount
+                  document.getElementById('apply').style.display = "none"
+                  document.getElementById('unApply').style.display = "block"
+                  document.getElementById('disCol').style.display = ""
+                  document.getElementById('appliedBadge').style.display = ""
+                  document.getElementById('couponcode').value=code
+                  Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Discount redeemed',
+                    showConfirmButton: false,
+                    timer: 1500
+                  })
+                  
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops !!!',
+                    text: 'Invalid Coupon!!!'
+                  })
+                }
+              }
+            })
+          }
+          </script>
+
 
 
 <script>
@@ -334,12 +508,16 @@ function change() {
 </script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.14.0/dist/sweetalert2.all.min.js"></script>
+
 <script>
+    
+    let codes = 
+    
     document.getElementById('the-checkout-form').addEventListener('submit', (e) => {
         console.log("AAh pressed");
         e.preventDefault();
         $.ajax({
-            url: "/saveorder",
+            url: `/saveorder?code=${document.getElementById('couponcode').value}`,
             method: "post",
             data: $("#the-checkout-form").serialize(),
             success: ((response) => {
@@ -419,5 +597,6 @@ function change() {
     });
   }
 </script>
+
 
 <%- include('footer.ejs') %>

@@ -32,7 +32,7 @@
                         <i class="icon-bars"></i>
                     </button>
 
-                    <a href="index.html" class="logo">
+                    <a href="" class="logo">
                         <img src="images/Screenshot 2023-09-12 110622.png" alt="Molla Logo" width="140" height="40" style="margin-top:.5em ;">
                     </a>
 
@@ -50,39 +50,34 @@
                             </li>
                             <li>
                                 <li>
-                                    <a href="wishlist.html"><i class="icon-heart-o"></i> &nbsp My Wishlist <span>(3)</span></a></li>
+                                    <% if(cookie) { %>
+                                        <% if(wishlist) { %>
+                                    <a href="/wishlist"><i class="icon-heart-o"></i> &nbsp My Wishlist 
+                                            
+                                        <span>(<%= wishlist.Products.length %>)</span>
+                                    </a>
+                                    <% }else{ %>
+                                        <a href="/wishlist"><i class="icon-heart-o"></i> &nbsp My Wishlist 
+                                            
+                                            <span>(0)</span>
+                                        </a>
+                                        <% } %>
+                                    <% } else { %>
+                                        <a href="/wishlist"><i class="icon-heart-o"></i> &nbsp My Wishlist 
+                                            
+                                            
+                                        </a>
 
-                                <div class="megamenu megamenu-sm">
-                                    <div class="row no-gutters">
-                                        <div class="col-md-6">
-                                            <div class="menu-col">
-                                                <div class="menu-title">Product Details</div><!-- End .menu-title -->
-                                                <ul>
-                                                    <li><a href="product.html">Default</a></li>
-                                                    <li><a href="product-centered.html">Centered</a></li>
-                                                    <li><a href="product-extended.html"><span>Extended Info<span class="tip tip-new">New</span></span></a></li>
-                                                    <li><a href="product-gallery.html">Gallery</a></li>
-                                                    <li><a href="product-sticky.html">Sticky Info</a></li>
-                                                    <li><a href="product-sidebar.html">Boxed With Sidebar</a></li>
-                                                    <li><a href="product-fullwidth.html">Full Width</a></li>
-                                                    <li><a href="product-masonry.html">Masonry Sticky Info</a></li>
-                                                </ul>
-                                            </div><!-- End .menu-col -->
-                                        </div><!-- End .col-md-6 -->
+                                        <% } %>
 
-                                        <div class="col-md-6">
-                                            <div class="banner banner-overlay">
-                                                <a href="category.html">
-                                                    <img src="assets/images/menu/banner-2.jpg" alt="Banner">
+                                </li>
 
-                                                    <div class="banner-content banner-content-bottom">
-                                                        <div class="banner-title text-white">New Trends<br><span><strong>spring 2019</strong></span></div><!-- End .banner-title -->
-                                                    </div><!-- End .banner-content -->
-                                                </a>
-                                            </div><!-- End .banner -->
-                                        </div><!-- End .col-md-6 -->
-                                    </div><!-- End .row -->
-                                </div><!-- End .megamenu megamenu-sm -->
+                                <!-- End .megamenu megamenu-sm -->
+                            </li>
+                            <li>
+                                <a href="/getorder" >My orders</a>
+
+                                <!-- End .megamenu megamenu-md -->
                             </li>
                             <li>
                                 <li>
@@ -112,11 +107,12 @@
 
                 <div class="header-right">
                     <div class="header-search">
-                        <a href="#" class="search-toggle" role="button" title="Search"><i class="icon-search"></i></a>
-                        <form action="#" method="get">
+                        <a href="" class="search-toggle" role="button" title="Search"><i class="icon-search"></i></a>
+                        <form action="/shop" method="get">
                             <div class="header-search-wrapper">
-                                <label for="q" class="sr-only">Search</label>
-                                <input type="search" class="form-control" name="q" id="q" placeholder="Search in..." required>
+                                <label for="search" class="sr-only">Search</label>
+                                <input type="search" class="form-control" name="search" id="Productsearch" placeholder="Search in..." required>
+                                <button type="submit" class="btn btn-primary"><i class="icon-search" style="color: rgb(0, 0, 0);"></i></button>
                             </div><!-- End .header-search-wrapper -->
                         </form>
                     </div><!-- End .header-search -->
@@ -159,7 +155,7 @@
                                         }
                                     }
                                 }'>
-
+                                <% if(banner) { %>
                                 <% for(var i = 0; i <banner.length; i++) { %>
                                 <div class="intro-slide">
                                     <figure class="slide-image" style="object-fit: cover; " >
@@ -180,6 +176,28 @@
                                     </div><!-- End .intro-content -->
                                 </div><!-- End .intro-slide -->
                                 <% } %>
+                                <% }else{ %>
+                                    <div class="intro-slide">
+                                        <figure class="slide-image" style="object-fit: cover; " >
+                                            <picture>
+                                                <source media="(max-width: 280px)" srcset="assets/images/slider/slide-1-480w.jpg">
+                                                <img src="/assets/images/slider/slide-1-480w.jpg" alt="Image Desc">
+                                            </picture>
+                                        </figure><!-- End .slide-image -->
+    
+                                        <div class="intro-content">
+                                            <h3 class="intro-subtitle"></h3><!-- End .h3 intro-subtitle -->
+                                            <h1 class="intro-title"><%= banner[i].matter %></h1><!-- End .intro-title -->
+    
+                                            <a href="/shop" class="btn btn-outline-white">
+                                                <span>SHOP NOW</span>
+                                                <i class="icon-long-arrow-right"></i>
+                                            </a>
+                                        </div><!-- End .intro-content -->
+                                    </div><!-- End .intro-slide -->
+
+                                    <% } %>
+
                                 <!-- End .intro-slide -->
 
                                 <!-- End .intro-slide -->
@@ -208,7 +226,7 @@
 
                         <div class="banner-content banner-content-center">
                             <h3 class="banner-title text-white"><a href="#"><%= cata[i].catagory %></a></h3><!-- End .banner-title -->
-                            <a href="/shop/?name=<%= cata[i].catagory %>" class="btn btn-outline-white banner-link">Shop Now<i class="icon-long-arrow-right"></i></a>
+                            <a href="/shop/?name=<%= cata[i]._id %>" class="btn btn-outline-white banner-link">Shop Now<i class="icon-long-arrow-right"></i></a>
                         </div><!-- End .banner-content -->
                     </div><!-- End .banner -->
                 </div><!-- End .col-sm-6 col-lg-3 -->
@@ -224,20 +242,7 @@
             <div class="heading heading-center mb-6">
                 <h2 class="title">Recent Arrivals</h2><!-- End .title -->
 
-                <ul class="nav nav-pills nav-border-anim justify-content-center" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="top-all-link" data-toggle="tab" href="#top-all-tab" role="tab" aria-controls="top-all-tab" aria-selected="true">All</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="top-fur-link" data-toggle="tab" href="#top-fur-tab" role="tab" aria-controls="top-fur-tab" aria-selected="false">Furn</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="top-decor-link" data-toggle="tab" href="#top-decor-tab" role="tab" aria-controls="top-decor-tab" aria-selected="false">Decor</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="top-light-link" data-toggle="tab" href="#top-light-tab" role="tab" aria-controls="top-light-tab" aria-selected="false">Lighting</a>
-                    </li>
-                </ul>
+                
             </div><!-- End .heading -->
 
 
@@ -266,7 +271,7 @@
                                         </a>
 
                                         <div class="product-action-vertical">
-                                            <a href="/productdetials/<%= product[i]._id %>" class="btn-product-icon btn-wishlist "><span>add to wishlist</span></a>
+                                            <a href="/addwish?id=<%= product[i]._id  %>" class="btn-product-icon btn-wishlist "><span>add to wishlist</span></a>
                                         </div><!-- End .product-action-vertical -->
                                     </figure><!-- End .product-media -->
 
@@ -278,7 +283,15 @@
 
                                         <div class="product-nav product-nav-dots" style="color: rgb(198, 25, 6); text-decoration: line-through;">
                                            <p>Original price :</p>₹ <%= product[i].Price %>
-                                        </div><!-- End .product-nav -->
+                                        </div>
+                                        <br>
+                                        <% if(product[i].Stoke<=1 ){ %>
+
+                                                <p style="color: red;">!! Out of Stock !!</p>
+                                             
+                                       <% }else if(product[i].Stoke<5){  %>
+                                            <p style="color: rgb(255, 183, 0);">!!Only Few Left!!</p>
+                                            <% } %>
                                     </div><!-- End .product-body -->
                                     <div class="product-action">
                                         <a href="/addtocarthome/<%= product[i]._id %>" class="btn-product btn-cart"><span>add to cart</span></a>
@@ -303,7 +316,7 @@
 
             </div><!-- End .tab-content -->
             <div class="more-container text-center">
-                <a href="#" class="btn btn-outline-darker btn-more"><span>Load more products</span><i class="icon-long-arrow-down"></i></a>
+                <a href="/shop" class="btn btn-outline-darker btn-more"><span>Load more products</span><i class="icon-long-arrow-down"></i></a>
             </div><!-- End .more-container -->
         </div><!-- End .container -->
 
@@ -349,116 +362,18 @@
 
             <div class="mb-2"></div><!-- End .mb-2 -->
         </div><!-- End .container -->
-        <div class="blog-posts pt-7 pb-7" style="background-color: #fafafa;">
-            <div class="container">
-               <h2 class="title-lg text-center mb-3 mb-md-4">From Our Blog</h2><!-- End .title-lg text-center -->
-
-                <div class="owl-carousel owl-simple carousel-with-shadow" data-toggle="owl" 
-                    data-owl-options='{
-                        "nav": false, 
-                        "dots": true,
-                        "items": 3,
-                        "margin": 20,
-                        "loop": false,
-                        "responsive": {
-                            "0": {
-                                "items":1
-                            },
-                            "600": {
-                                "items":2
-                            },
-                            "992": {
-                                "items":3
-                            }
-                        }
-                    }'>
-                    <article class="entry entry-display">
-                        <figure class="entry-media">
-                            <a href="single.html">
-                                <img src="assets/images/blog/home/post-1.jpg" alt="image desc">
-                            </a>
-                        </figure><!-- End .entry-media -->
-
-                        <div class="entry-body pb-4 text-center">
-                            <div class="entry-meta">
-                                <a href="#">Nov 22, 2018</a>, 0 Comments
-                            </div><!-- End .entry-meta -->
-
-                            <h3 class="entry-title">
-                                <a href="single.html">Sed adipiscing ornare.</a>
-                            </h3><!-- End .entry-title -->
-
-                            <div class="entry-content">
-                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Phasellus hendrerit.<br>Pelletesque aliquet nibh necurna. </p>
-                                <a href="single.html" class="read-more">Read More</a>
-                            </div><!-- End .entry-content -->
-                        </div><!-- End .entry-body -->
-                    </article><!-- End .entry -->
-
-                    <article class="entry entry-display">
-                        <figure class="entry-media">
-                            <a href="single.html">
-                                <img src="assets/images/blog/home/post-2.jpg" alt="image desc">
-                            </a>
-                        </figure><!-- End .entry-media -->
-
-                        <div class="entry-body pb-4 text-center">
-                            <div class="entry-meta">
-                                <a href="#">Dec 12, 2018</a>, 0 Comments
-                            </div><!-- End .entry-meta -->
-
-                            <h3 class="entry-title">
-                                <a href="single.html">Fusce lacinia arcuet nulla.</a>
-                            </h3><!-- End .entry-title -->
-
-                            <div class="entry-content">
-                                <p>Sed pretium, ligula sollicitudin laoreet<br>viverra, tortor libero sodales leo, eget blandit nunc tortor eu nibh. Nullam mollis justo. </p>
-                                <a href="single.html" class="read-more">Read More</a>
-                            </div><!-- End .entry-content -->
-                        </div><!-- End .entry-body -->
-                    </article><!-- End .entry -->
-
-                    <article class="entry entry-display">
-                        <figure class="entry-media">
-                            <a href="single.html">
-                                <img src="assets/images/blog/home/post-3.jpg" alt="image desc">
-                            </a>
-                        </figure><!-- End .entry-media -->
-
-                        <div class="entry-body pb-4 text-center">
-                            <div class="entry-meta">
-                                <a href="#">Dec 19, 2018</a>, 2 Comments
-                            </div><!-- End .entry-meta -->
-
-                            <h3 class="entry-title">
-                                <a href="single.html">Quisque volutpat mattis eros.</a>
-                            </h3><!-- End .entry-title -->
-
-                            <div class="entry-content">
-                                <p>Suspendisse potenti. Sed egestas, ante et vulputate volutpat, eros pede semper est, vitae luctus metus libero eu augue. </p>
-                                <a href="single.html" class="read-more">Read More</a>
-                            </div><!-- End .entry-content -->
-                        </div><!-- End .entry-body -->
-                    </article><!-- End .entry -->
-                </div><!-- End .owl-carousel -->
-            </div><!-- container -->
-
-            <div class="more-container text-center mb-0 mt-3">
-                <a href="blog.html" class="btn btn-outline-darker btn-more"><span>View more articles</span><i class="icon-long-arrow-right"></i></a>
-            </div><!-- End .more-container -->
-        </div>
+        
         <div class="cta cta-display bg-image pt-4 pb-4" style="background-image: url(assets/images/backgrounds/cta/bg-6.jpg);">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-md-10 col-lg-9 col-xl-8">
                         <div class="row no-gutters flex-column flex-sm-row align-items-sm-center">
                             <div class="col">
-                                <h3 class="cta-title text-white">Sign Up & Get 10% Off</h3><!-- End .cta-title -->
-                                <p class="cta-desc text-white">Molla presents the best in interior design</p><!-- End .cta-desc -->
+                                <h3 class="cta-title text-white">Sign Up & Get unbeleivable  Off</h3><!-- End .cta-title -->
                             </div><!-- End .col -->
 
                             <div class="col-auto">
-                                <a href="login.html" class="btn btn-outline-white"><span>SIGN UP</span><i class="icon-long-arrow-right"></i></a>
+                                <a href="/sin" class="btn btn-outline-white"><span>SIGN UP</span><i class="icon-long-arrow-right"></i></a>
                             </div><!-- End .col-auto -->
                         </div><!-- End .row no-gutters -->
                     </div><!-- End .col-md-10 col-lg-9 -->
@@ -467,21 +382,21 @@
         </div><!-- End .cta -->
     </main><!-- End .main -->
 
-    <footer class="footer footer-dark">
+    <footer class="footer footer" style="color: black;">
         <div class="footer-middle">
             <div class="container">
                 <div class="row">
                     <div class="col-sm-6 col-lg-3">
                         <div class="widget widget-about">
-                            <img src="assets/images/logo-footer.png" class="footer-logo" alt="Footer Logo" width="105" height="25">
-                            <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. </p>
+                            <img src="/images/Screenshot 2023-09-12 110622.png" class="footer-logo" alt="Footer Logo" width="105" height="25">
+                            <p style="color: black;">ELECTRO MANIA the perfect choice for digital world  </p>
 
                             <div class="social-icons">
-                                <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
-                                <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
-                                <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
-                                <a href="#" class="social-icon" title="Youtube" target="_blank"><i class="icon-youtube"></i></a>
-                                <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+                                <a href="https://www.instagram.com/mohd_sharhan_/#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                                <a href="https://www.instagram.com/mohd_sharhan_/#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                                <a href="https://www.instagram.com/mohd_sharhan_/#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+                                <a href="https://www.instagram.com/mohd_sharhan_/#" class="social-icon" title="Youtube" target="_blank"><i class="icon-youtube"></i></a>
+                                <a href="https://www.instagram.com/mohd_sharhan_/#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
                             </div><!-- End .soial-icons -->
                         </div><!-- End .widget about-widget -->
                     </div><!-- End .col-sm-6 col-lg-3 -->
@@ -513,18 +428,18 @@
                                 <li><a href="#">Privacy Policy</a></li>
                             </ul><!-- End .widget-list -->
                         </div><!-- End .widget -->
-                    </div><!-- End .col-sm-6 col-lg-3 -->
+                    </div>
 
                     <div class="col-sm-6 col-lg-3">
                         <div class="widget">
                             <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
 
                             <ul class="widget-list">
-                                <li><a href="#">Sign In</a></li>
-                                <li><a href="cart.html">View Cart</a></li>
-                                <li><a href="#">My Wishlist</a></li>
-                                <li><a href="#">Track My Order</a></li>
-                                <li><a href="#">Help</a></li>
+                                <li><a href="/sin">Sign In</a></li>
+                                <li><a href="/viewcart">View Cart</a></li>
+                                <li><a href="/wishlist">My Wishlist</a></li>
+                                <li><a href="/getorder">Track My Order</a></li>
+                                
                             </ul><!-- End .widget-list -->
                         </div><!-- End .widget -->
                     </div><!-- End .col-sm-6 col-lg-3 -->
@@ -534,7 +449,7 @@
 
         <div class="footer-bottom">
             <div class="container">
-                <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p><!-- End .footer-copyright -->
+                <p class="footer-copyright">Copyright © 2019 ELECTRO MANIA Store. All Rights Reserved.</p><!-- End .footer-copyright -->
                 <figure class="footer-payments">
                     <img src="assets/images/payments.png" alt="Payment methods" width="272" height="20">
                 </figure><!-- End .footer-payments -->
@@ -551,29 +466,51 @@
     <div class="mobile-menu-wrapper">
         <span class="mobile-menu-close"><i class="icon-close"></i></span>
 
-        <form action="#" method="get" class="mobile-search">
+        <form action="/shop" method="get" class="mobile-search">
             <label for="mobile-search" class="sr-only">Search</label>
-            <input type="search" class="form-control" name="mobile-search" id="mobile-search" placeholder="Search in..." required>
+            <input type="search" class="form-control" name="search" id="mobile-search" placeholder="Search in..." required>
             <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
         </form>
         
         <nav class="mobile-nav">
             <ul class="mobile-menu">
                 <li class="active">
-                    <a href="index.html">Home</a>
+                    <a href="/">Home</a>
 
                     
                 <li>
-                    <a href="category.html">Shop</a>
+                    <a href="/shop">Shop</a>
                     
                 </li>
                 <li>
-                    <a href="wishlist.html"><i class="icon-heart-o"></i> &nbsp My Wishlist <span>(3)</span></a>
+                    <a href="/getorder" >My orders</a>
+                </li>
+                <li>
+                    <% if(cookie) { %>
+                        <% if(wishlist) { %>
+                    <a href="/wishlist"><i class="icon-heart-o"></i> &nbsp My Wishlist 
+                            
+                        <span>(<%= wishlist.Products.length %>)</span>
+                    </a>
+                    <% }else{ %>
+                        <a href="/wishlist"><i class="icon-heart-o"></i> &nbsp My Wishlist 
+                            
+                            <span>(0)</span>
+                        </a>
+                        <% } %>
+                    <% } else { %>
+                        <a href="/wishlist"><i class="icon-heart-o"></i> &nbsp My Wishlist 
+                            
+                            
+                        </a>
+
+                        <% } %>
                    
                     
                 </li>
+                
                 <li>
-                    <li>
+                    
                         
                     <%if(cookie) { %>
                         <a href="/dash"><i class="icon-user"></i> &nbsp <%= cookie.name %></a>
@@ -582,7 +519,7 @@
                         <% } %>
                         </li>
                     
-                        </li>
+                        
                        
                         
                     
@@ -596,24 +533,40 @@
         </nav><!-- End .mobile-nav -->
 
         <div class="social-icons">
-            <a href="#" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
-            <a href="#" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
-            <a href="#" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
-            <a href="#" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
+            <a href="" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
+            <a href="" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
+            <a href="" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
+            <a href="" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
         </div><!-- End .social-icons -->
     </div><!-- End .mobile-menu-wrapper -->
 </div><!-- End .mobile-menu-container -->
 
 <!-- Sign in / Register Modal -->
-/>.End .tab-pane
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.14.0/dist/sweetalert2.all.min.js"></script>
+
+<% if(error){ %>
+    <script>
+    Swal.fire({
+      title: "error",
+      text: '<%= error %>',
+      icon: "error",
+      confirmButtonText: "OK"
+    });
+    </script>
+    <% } %>
                             
 <!-- Plugins JS File -->
-<script src="assets/js/jquery.min.js"></script>
-<script src="assets/js/bootstrap.bundle.min.js"></script>
-<script src="assets/js/jquery.hoverIntent.min.js"></script>
-<script src="assets/js/jquery.waypoints.min.js"></script>
-<script src="assets/js/superfish.min.js"></script>
-<script src="assets/js/owl.carousel.min.js"></script>
-<script src="assets/js/jquery.magnific-popup.min.js"></script>
+<script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/jquery.hoverIntent.min.js"></script>
+    <script src="/assets/js/jquery.waypoints.min.js"></script>
+    <script src="/assets/js/superfish.min.js"></script>
+    <script src="/assets/js/owl.carousel.min.js"></script>
+    <script src="/assets/js/bootstrap-input-spinner.js"></script>
+    <script src="/assets/js/jquery.elevateZoom.min.js"></script>
+    <script src="/assets/js/bootstrap-input-spinner.js"></script>
+    <script src="/assets/js/jquery.magnific-popup.min.js"></script>
+    <!-- Main JS File -->
+    <script src="/assets/js/main.js"></script>
 <!-- Main JS File -->
 <%- include('footer.ejs') %>

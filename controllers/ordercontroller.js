@@ -11,10 +11,12 @@ const catagory = require('../model/catagory')
 const helper = require('../helpers/paymenthelper')
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const Coupon = require('../model/coupon')
 
 
 const { errorMonitor } = require('nodemailer/lib/xoauth2');
 const ban = require('../model/banner');
+const { isValidObjectId } = require('mongoose');
 
 var instance = new Razorpay({
     key_id: 'rzp_test_f0CUyOMdkz5Ems',
@@ -22,17 +24,56 @@ var instance = new Razorpay({
 });
 
 
+const getorder = async function(req, res, next) {
+    try{
+
+        const orders = await Orders.find({Userid:req.cookies.user.id,Status:{$in:['delivered','active']}}).sort({Orderdate:-1})
+
+        if(orders){
+
+            if(req.query.cancel){
+                const cancelid = req.query.cancel
+                res.render('user/orders',{orders,cancelid})    
+            }else{
+
+                res.render('user/orders',{orders,cancelid:""})
+            }
+
+        }
+    }catch(err){
+        console.log(err);
+    }
+}
+
+const getcancel = async function(req, res, next) {
+    try{
+        const orders = await Orders.find({Userid:req.cookies.user.id,Status:{$in:['Cancelled','Returned']}}).sort({Orderdate:-1})
+        if(orders){
+            res.render('user/cancelledorders',{orders})  
+        }else{
+            res.render('user/cancelledorders',{orders:""})
+        }
+
+    } catch(err){
+        console.log(err);
+    }
+}
+
+
+
 const saveorder = async function (req, res) {
     try {
+        console.log("coupon"+req.query.code);
+        let total 
         console.log(req.body);
         let orderid
         let date = new Date()
         let payment = req.body.payment
         let userId
+        const coupon = req.query.code
         if (req.cookies.user) {
             userId = req.cookies.user.id;
         }
-
         const user = await userdatacopy.findById(userId);
 
         if (!user) {
@@ -47,14 +88,18 @@ const saveorder = async function (req, res) {
             if (!productDetails) {
                 return res.status(400).json({ message: 'Product not found for ID: ' + productId });
             }
-            orderItems = [{
-                Payment: payment,
-                Productid: productDetails._id,
-                Productname: productDetails.Productname,
-                Productimg: productDetails.Imagepath[0],
-                Price: productDetails.Price - productDetails.Discount,
-                Quantity: req.body.quantity
-            }];
+            total = productDetails.Price - productDetails.Discount
+            
+                orderItems = [{
+                    Payment: payment,
+                    Productid: productDetails._id,
+                    Productname: productDetails.Productname,
+                    Productimg: productDetails.Imagepath[0],
+                    Price: total,
+                    Quantity: req.body.quantity
+                }];
+            
+            
 
         } else if (Array.isArray(productId)) {
 
@@ -64,14 +109,19 @@ const saveorder = async function (req, res) {
                 return res.status(400).json({ message: 'Products not found for the given IDs' });
             }
             orderItems = productDetails.map((product, index) => {
+                total= product.Price - product.Discount
                 return {
+
+                    
+
                     Payment: payment,
                     Productid: product._id,
                     Productname: product.Productname,
                     Productimg: product.Imagepath[0],
-                    Price: product.Price - product.Discount,
+                    Price: total,
                     Quantity: req.body.quantity[index],
                 };
+            
             });
         } else {
 
@@ -93,7 +143,16 @@ const saveorder = async function (req, res) {
 
 
 
-        const totalAmount = orderItems.reduce((total, item) => total + item.Price * item.Quantity, 0);
+        let totalAmount = orderItems.reduce((total, item) => total + item.Price * item.Quantity, 0);
+
+        if(coupon!=0){
+            const couponcode= await Coupon.findOne({couponcode:coupon})
+                if(couponcode){
+                    await Coupon.updateOne({couponcode:coupon},{$inc:{userslimit:-1}})
+                await Coupon.updateOne({couponcode:coupon},{$push:{usedusers:req.cookies.user.id}})
+                totalAmount= totalAmount-couponcode.discountamount 
+        }
+    }
 
         const orderData = {
             Userid: user._id,
@@ -126,8 +185,49 @@ const saveorder = async function (req, res) {
 
 
         } else if (payment === 'cod') {
+            const product = await Orders.findOne({ _id: orderid._id })
             await Orders.updateOne({ Orderdate: date }, { $set: { Status: 'active' } })
+            for (let i = 0; i < product.Items.length; i++) {
+                const pro = product.Items[i].Productid;
+                const count = product.Items[i].Quantity;
+                await products.updateOne(
+                    { _id: pro },
+                    { $inc: { Stoke: -count } }
+                );
+            }
             res.json({ codsuccess: true })
+        } else if (payment === 'wallet') {
+            const userdata = await userdatacopy.findOne({ _id: req.cookies.user.id })
+
+            if (userdata.Wallet >= totalAmount) {
+                await userdatacopy.updateOne({ _id: req.cookies.user.id }, { $inc: { Wallet: -totalAmount } })
+                const product = await Orders.findOne({ _id: orderid._id })
+                await Orders.updateOne({ Orderdate: date }, { $set: { Status: 'active' } })
+                for (let i = 0; i < product.Items.length; i++) {
+                    const pro = product.Items[i].Productid;
+                    const count = product.Items[i].Quantity;
+                    await products.updateOne(
+                        { _id: pro },
+                        { $inc: { Stoke: -count } }
+                    );
+                }
+
+                const newWalletHistory = {
+                    Date: Date.now(),
+                    Amount: totalAmount,
+                    Description: "Debited for a purchase",
+                    Status: 'Debited'
+                };
+
+                await userdatacopy.findOneAndUpdate(
+                    { _id: req.cookies.user.id },
+                    { $push: { WalletHistory: newWalletHistory } }
+                );
+                res.json({ codsuccess: true })
+            } else {
+                res.redirect('/checkout?balance="inssufficient balance')
+            }
+
         }
 
 
@@ -140,16 +240,16 @@ const saveorder = async function (req, res) {
 
 const placeorder = async function (req, res, next) {
     userid = req.cookies.user.id
-    let array= []
+    let array = []
     const name = req.cookies.user.id
 
     const address = await Orders.findOne({ Userid: name })
     const cart = await cartModel.findOne({ Userid: userid });
-     cart.Products.forEach(element => {
+    cart.Products.forEach(element => {
         array.push(element.Productid)
     });
-    
-    await products.updateMany({ _id: { $in: array } },{$inc:{soldcount:+1}})
+
+    await products.updateMany({ _id: { $in: array } }, { $inc: { soldcount: +1 } })
     cart.Products = []
 
     await cart.save();
@@ -157,36 +257,7 @@ const placeorder = async function (req, res, next) {
     res.render('user/placeorder', { address })
 }
 
-const removeorder = async function (req, res,) {
-    try {
-        const orderId = req.params.id;
-        const Ordersid = req.params.oid;
-        console.log("orderid : " + orderId, "userid : " + Ordersid);
 
-        // Find the order and update the Items array
-        const order = await Orders.findById(Ordersid);
-
-        // Filter out the item with the given _id
-        const index = order.Items.findIndex((item) => item._id == orderId);
-        order.Totalamount = order.Totalamount - order.Items[index].Price;
-
-        order.Items = order.Items.filter(
-            (item) => item._id.toString() !== orderId
-        );
-
-        if (order.Items.length < 1) {
-            await Orders.findByIdAndRemove(Ordersid);
-        }
-        // Save the updated order
-        await order.save();
-
-        res.redirect('/dash')
-    } catch (error) {
-        console.error("Error removing item:", error);
-        res.status(500).send("Internal Server Error");
-    }
-
-}
 
 
 const verifyPayment = async (req, res) => {
@@ -246,7 +317,7 @@ const vieworder = async function (req, res, next) {
         let id = req.query.id
 
         const order = await Orders.findOne({ _id: id });
-        console.log("order", order);
+
         res.render('user/vieworder', { order: order })
 
 
@@ -261,21 +332,141 @@ const vieworder = async function (req, res, next) {
 const cancelorder = async function (req, res, next) {
     try {
 
-        let order = req.params.id
-
+        let order = req.query.id
         await Orders.findOneAndUpdate({ _id: order }, { $set: { Status: 'Cancelled' } })
-        next()
+        const product = await Orders.findOne({ _id: order })
+
+        let productid = []
+        for (let i = 0; i < product.Items.length; i++) {
+            const pro = product.Items[i].Productid;
+            const quantity = product.Items[i].Quantity
+            productid.push({ id: pro, quantity: quantity });
+        }
+        console.log(productid);
+        productid.map(async (item) => {
+            await products.updateOne({ _id: item.id }, { $inc: { Stoke: +item.quantity } })
+        })
+
+        res.redirect('/getorder')
     } catch (err) {
         console.log(err);
     }
 }
 
+const cancelpod = async function (req, res) {
+
+    const orderid = req.body.id
+    const reason = req.body.desc
+
+    console.log(req.body);
+
+    const product = await Orders.findOne({ _id: orderid })
+    console.log(product);
+    const total = await Orders.findOne({ _id: orderid })
+    await Orders.findOneAndUpdate({ _id: orderid }, { $set: { Status: 'Cancelled' } })
+    if (total) {
+
+        await userdatacopy.updateOne({ _id: req.cookies.user.id }, { $inc: { Wallet: +total.Totalamount } })
+    }
+
+    let productid = []
+    for (let i = 0; i < product.Items.length; i++) {
+        const pro = product.Items[i].Productid;
+        const quantity = product.Items[i].Quantity
+        productid.push({ id: pro, quantity: quantity });
+    }
+    console.log(productid);
+    productid.map(async (item) => {
+        await products.updateOne({ _id: item.id }, { $inc: { Stoke: +item.quantity } })
+    })
+    const newWalletHistory = {
+        Date: Date.now(),
+        Amount: total.Totalamount,
+        Description: reason,
+        Status: 'Credited'
+    };
+
+    await userdatacopy.findOneAndUpdate(
+        { _id: req.cookies.user.id },
+        { $push: { WalletHistory: newWalletHistory } }
+    );
+
+    res.redirect('/getorder?cancel="order cancelled"')
+
+
+
+
+}
+
+
+const viewwallet = async function (req, res) {
+    try {
+
+        const userdata = await userdatacopy.findOne({ _id: req.cookies.user.id })
+        res.render('user/viewwallet', { userdata })
+    } catch (err) {
+        console.log(err);
+    }
+
+}
+
+
+const returnorder = async function (req, res) {
+    const orderid = req.body.id
+    const reason = req.body.desc
+
+    console.log(req.body);
+
+    const product = await Orders.findOne({ _id: orderid })
+    console.log(product);
+    const total = await Orders.findOne({ _id: orderid })
+    await Orders.findOneAndUpdate({ _id: orderid }, { $set: { Status: 'Returned' } })
+    if (total) {
+
+        await userdatacopy.updateOne({ _id: req.cookies.user.id }, { $inc: { Wallet: +total.Totalamount } })
+    }
+
+    let productid = []
+    for (let i = 0; i < product.Items.length; i++) {
+        const pro = product.Items[i].Productid;
+        const quantity = product.Items[i].Quantity
+        productid.push({ id: pro, quantity: quantity });
+    }
+    console.log(productid);
+    productid.map(async (item) => {
+        await products.updateOne({ _id: item.id }, { $inc: { Stoke: +item.quantity } })
+    })
+    const newWalletHistory = {
+        Date: Date.now(),
+        Amount: total.Totalamount,
+        Description: reason,
+        Status: 'Credited'
+    };
+
+    await userdatacopy.findOneAndUpdate(
+        { _id: req.cookies.user.id },
+        { $push: { WalletHistory: newWalletHistory } }
+    );
+
+    res.redirect('/getorder?cancel="order cancelled"')
+
+
+
+
+}
+
+
+
 
 module.exports = {
     saveorder,
     placeorder,
-    removeorder,
     verifyPayment,
     vieworder,
-    cancelorder
+    cancelorder,
+    cancelpod,
+    viewwallet,
+    returnorder,
+    getorder,
+    getcancel
 }

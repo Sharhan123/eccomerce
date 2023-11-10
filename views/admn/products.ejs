@@ -70,7 +70,7 @@
 <div class="row">
 <div class="col-lg-12 grid-margin stretch-card">
     <div class="card">
-      <div class="card-body">
+      <div class="card-body" id="table">
         
         <button class="btn btn-success" id="openAddProduct">Add Products</button>
         
@@ -81,7 +81,7 @@
               <tr>
                 <th> Image </th>
                 <th> First name </th>
-                <th> Catagory </th>
+                
                 <th> Amount </th>
                 <th> Stock </th>
                 <th> Actions </th>
@@ -89,35 +89,33 @@
             </thead>
             <tbody>
                 <% if (product) { %>
-                <% product.map((product, index)=> { %>
+                <% product.map((item, index)=> { %>
               <tr id="product-row">
                 <td class="py-1">
-                  <img src="<%= product.Imagepath[0] %>" alt="image" >
+                  <img src="<%= item.Imagepath[0] %>" alt="image" >
                 </td>
-                <td style="color: white;" id="product-name"> <%= product.Productname %> </td>
-                <td style="color: rgb(215, 190, 0);" id="product-category">
-                    <%= product.Category %>
-                </td>
-                <td style="color: rgb(255, 255, 255);"> ₹<%= product.Price %></td>
-                <% if(product.Stoke<=0) { %>
+                <td style="color: white;" id="product-name"> <%= item.Productname %> </td>
+                <td style="color: white;" id="product-name"> <%= item.Category.catagory %> </td>
+                <td style="color: rgb(255, 255, 255);"> ₹<%= item.Price %></td>
+                <% if(item.Stoke<=1) { %>
                   <td style="color: rgb(255, 2, 2);"> Out of Stoke </td>
 
                   <% }else { %>
-                <td style="color: rgb(15, 43, 255);"> <%= product.Stoke %> </td>
+                <td style="color: rgb(15, 43, 255);"> <%= item.Stoke %> </td>
                 <% } %>
                 <td> <a  class="btn btn-danger delete-button"
-                  onclick="showDeleteConfirmation(event,'<%= product._id %>')">Delete</a> </td>
+                  onclick="showDeleteConfirmation(event,'<%= item._id %>')">Delete</a> </td>
                 <td> <button class="btn btn-primary openEditBtn" onclick="editClick({
-                    pid:`<%= product._id %>`,
-                    pname:`<%= product.Productname %>`,
-                    category: `<%= product.Category %>`,
-                    specs: `<%= product.Spec %>`,
-                    desc: `<%= product.Description %>`,
-                    price: `<%= product.Price %>`,
-                    scost: `<%= product.Shipingcost %>`,
-                    discount: `<%= product.Discount %>`,
-                    stoke: `<%= product.Stoke %>`,
-                    images: `<%- product.Imagepath %>`
+                    pid:`<%= item._id %>`,
+                    pname:`<%= item.Productname %>`,
+                    category: `<%= item.Category.catagory %>`,
+                    specs: `<%= item.Spec %>`,
+                    desc: `<%= item.Description %>`,
+                    price: `<%=item.Price %>`,
+                    scost: `<%=item.Shipingcost %>`,
+                    discount: `<%= item.Discount %>`,
+                    stoke: `<%= item.Stoke %>`,
+                    images: `<%= item.Imagepath %>`
                 })">Edit</button>
                  </td>
               </tr>
@@ -222,7 +220,7 @@
                 <input type="number" name="scost" class="form-control" required>
             <div class="mb-3">
                 <label class="form-label">Discount amount</label>
-                <input type="number" name="discount" class="form-control" value="" required min="1">
+                <input type="number" name="discount" id="discount" class="form-control" value="" required min="1" >
             </div>
             <div class="mb-3">
                 <label class="form-label">Total stock</label>
@@ -251,18 +249,34 @@
 
 <%- include('foot.ejs') %>
 <script>
+  // Add an event listener to the "Discount amount" input field
+  const discountInput = document.getElementById("discount");
+  const priceInput = document.getElementById("price");
+
+  discountInput.addEventListener("input", function() {
+      const discountValue = parseFloat(discountInput.value);
+      const priceValue = parseFloat(priceInput.value);
+
+      if (discountValue > priceValue) {
+          discountInput.setCustomValidity("Discount cannot be greater than the price");
+      } else {
+          discountInput.setCustomValidity(""); // Clear the validation message
+      }
+  });
+</script>
+<script>
     let productid;
 
-    function editClick(product) {
-        productid = product.pid;
-        document.getElementById('pname').value = product.pname;
-        document.getElementById('category').value = product.category;
-        document.getElementById('specs').value = product.specs;
-        document.getElementById('desc').value = product.desc;
-        document.getElementById('price').value = product.price;
-        document.getElementById('scost').value = product.scost;
-        document.getElementById('discount').value = product.discount;
-        document.getElementById('stoke').value = product.stoke;
+    function editClick(item) {
+        productid = item.pid;
+        document.getElementById('pname').value = item.pname;
+        document.getElementById('category').value =item.category;
+        document.getElementById('specs').value = item.specs;
+        document.getElementById('desc').value = item.desc;
+        document.getElementById('price').value = item.price;
+        document.getElementById('scost').value = item.scost;
+        document.getElementById('discount').value = item.discount;
+        document.getElementById('stoke').value = item.stoke;
 
         const imgs = product.images.split(',');
 
@@ -377,20 +391,25 @@
 <script>
     $(document).ready(() => {
         $("#openAddProduct").click(() => {
-            $(".popUp").toggle(600);
+            $(".popUp").toggle(200);
+            $("#table").toggle(200);
         })
         $(".closeBtn").click(() => {
-            $(".popUp").toggle(300);
+            $(".popUp").toggle(200);
+            $("#table").toggle(200);
         })
     })
 </script>
 <script>
     $(document).ready(() => {
         $(".openEditBtn").click(() => {
-            $(".popUp-edit").toggle(300);
+            $(".popUp-edit").toggle(200);
+            $("#table").toggle(200);
+
         })
         $(".closeBtn-edit").click(() => {
-            $(".popUp-edit").toggle(300);
+            $(".popUp-edit").toggle(200);
+            $("#table").toggle(200);
         })
     })
 </script>
