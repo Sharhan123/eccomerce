@@ -29,6 +29,9 @@ const uschema= new mongoose.Schema(
             type:Boolean,
             required:true,
         },
+        Referalcode:{
+            type:Number,
+        },
         Wallet:{
             type:Number,
             default:0,

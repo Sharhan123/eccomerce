@@ -1,16 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const userdatacopy = require('../model/schema')
-const bycrypt = require('bcrypt')
-const nodemailer = require('nodemailer');
 const useraddresscopy = require('../model/address')
 const products = require('../model/product');
 const cartModel = require('../model/cart');
-const Orders = require('../model/orders');
-const catagory = require('../model/catagory')
-const helper = require('../helpers/paymenthelper')
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
 
 
 const getCart = async function (req, res) {
@@ -169,7 +162,7 @@ for(i=0;i<stockproduct.length;i++){
   console.log(id);
   if (cart.Products[0]) {
 
-    if(address.PrimaryAddress.Name){
+    if(address){
 
       res.render("user/checkout", {
         product: null,

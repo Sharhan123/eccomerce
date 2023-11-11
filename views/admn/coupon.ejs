@@ -95,6 +95,7 @@
               <tr id="product-row">
                 <td class="py-1">
                   <%= item.couponcode %>
+                  
                 </td>
                 <td style="color: white;" id="product-name"> <%= item.activationdate.toLocaleDateString() %>   </td>
                 <td style="color: white;" id="product-name"> <%= item.expirydate.toLocaleDateString()  %>  </td>
@@ -136,24 +137,29 @@
         <form action="/getadmin/addcoupon" method="post" >
             <div class="mb-3">
                 <label class="form-label">Coupon code</label>
-                <input type="text" class="form-control" id="fileUpload" name="code" required minlength="3" maxlength="15">
+                <input type="text"  class="form-control" id="coupon" name="code" required  minlength="3" maxlength="15">
             </div>
+            <p class="code" style=" color: red;"> </p>
             <div class="mb-3">
                 <label class="form-label">Activation Date</label>
-                <input type="date" class="form-control" id="fileUpload" name="adate" required  >
+                <input type="date" class="form-control" id="adate" name="adate" required  >
             </div>
+            <p class="ad" style=" color: red;"> </p>
             <div class="mb-3">
                 <label class="form-label">Expiry Date</label>
-                <input type="date" class="form-control" id="fileUpload" name="edate" required >
+                <input type="date" class="form-control" id="edate" name="edate" required >
             </div>
+            <p class="ed" style=" color: red;"> </p>
             <div class="mb-3">
                 <label class="form-label">Crieteria amount </label>
-                <input type="number" class="form-control" id="fileUpload" name="amount" required  min="1">
+                <input type="number" class="form-control" id="camount" name="amount" required  min="1">
             </div>
+            <p class="ca" style=" color: red;"> </p>
             <div class="mb-3">
                 <label class="form-label">Discount amount</label>
-                <input type="number" class="form-control" id="fileUpload" name="discount" required min="1" >
+                <input type="number" class="form-control" id="damount" name="discount" required min="1" >
             </div>
+            <p class="da" style=" color: red;"> </p>
             <div class="mb-3">
                 <label class="form-label">Users limit</label>
                 <input type="number" class="form-control" id="fileUpload" name="limit" required  min="1">
@@ -208,8 +214,105 @@
   </div> 
 </div>
 
+<% if (error) { %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      Swal.fire({
+        title: " info ",
+        text: "<%= error %>",
+        icon: "warning",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK",
+      });
+    });
+  </script>
+<% } %>
+
 <%- include('foot.ejs') %>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.14.0/dist/sweetalert2.all.min.js"></script>
+
+
+
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      // Get a reference to the Product Name input field
+      var couponcode = document.querySelector('input[id="coupon"]');
+      var activation = document.querySelector('input[id="adate"]')
+      var expiry = document.querySelector('input[id="edate"]')
+      var criteria = document.querySelector('input[id="camount"]')
+      var discount = document.querySelector('input[id="damount"]')
+      // Keep track of the previously entered product names
+      var previousNames = new Set();
+      
+      // Set the maximum character limit
+      var minCharacters=3
+      var maxCharacters = 8; // Change this to your desired character limit
+      
+      // Listen for input events on the input field
+      couponcode.addEventListener("input", function(event) {
+          var enteredName = couponcode.value;
+          document.querySelector('.code').textContent="";
+          document.getElementById('coupon').style.borderColor='';
+          // Check for character limit
+          if (enteredName.length > maxCharacters) {
+            document.getElementById('coupon').style.borderColor='red'
+              document.querySelector('.code').textContent="Product Name is too long. Please keep it under " + maxCharacters + " characters."
+              productNameInput.value = enteredName.slice(0, maxCharacters);
+          }
+          
+          if (enteredName.length < minCharacters) {
+            document.getElementById('coupon').style.borderColor='red'
+            document.querySelector('.code').textContent="Product Name is too short. Please keep it Above " + minCharacters + " characters."
+              productNameInput.value = enteredName.slice(0, minCharacters);
+          }
+
+          // Check for repeated names
+          
+      });
+
+      activation.addEventListener("input", function(event) {
+          var enteredName = new Date(activation.value);
+          var currentDate = Date.now();
+          document.querySelector('.ad').textContent="";
+          document.getElementById('adate').style.borderColor=''
+          // Check for character limit
+          if (enteredName <= currentDate  ) {
+            document.getElementById('adate').style.borderColor='red'
+              document.querySelector('.ad').textContent="The price shouldn't be less than now. "
+              price.value = enteredName.slice(0, maxCharacters);
+          }
+          
+          
+         
+      });
+
+      expiry.addEventListener("input", function(event) {
+          var enteredName = new Date(expiry.value);
+          var enteredprice = new Date(activation.value)
+          document.querySelector('.ed').textContent="";
+          document.getElementById('edate').style.borderColor=''
+          // Check for character limit
+          if (enteredName <= enteredprice ) {
+            document.getElementById('edate').style.borderColor='red'
+              document.querySelector('.ed').textContent="Expiry date should be greater than activation.  " 
+              discount.value = enteredName.slice(0, maxCharacters);
+          }
+          
+         
+          
+         
+      });
+
+      
+      
+      
+  });
+</script>
+
+
+
 
 
 <script>
@@ -225,6 +328,7 @@
       });
   });
 </script>
+
 
 
 <script>

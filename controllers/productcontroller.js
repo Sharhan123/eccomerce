@@ -15,7 +15,7 @@ const wishmodel = require('../model/whishlist')
 const getproductdetials = async function (req, res) {
   const id = req.params.pid;
   const otherproducts = await products.find({})
-  const product = await products.findOne({ _id: id })
+  const product = await products.findOne({ _id: id }).populate('Category')
 
 
   if (req.cookies.user) {

@@ -33,7 +33,7 @@
                         <i class="icon-bars"></i>
                     </button>
 
-                    <a href="index.html" class="logo">
+                    <a href="/" class="logo">
                         <img src="/images/Screenshot 2023-09-12 110622.png" alt="Molla Logo" width="140" height="40" style="margin-top:.5em ;">
                     </a>
 
@@ -172,10 +172,8 @@
                                     <h1 class="product-title"><%= product.Productname %></h1><!-- End .product-title -->
 
                                     <div class="ratings-container">
-                                        <div class="ratings">
-                                            <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
-                                        </div><!-- End .ratings -->
-                                        <a class="ratings-text" href="#product-review-link" id="review-link">( 2 Reviews )</a>
+                                        <!-- End .ratings -->
+                                        
                                     </div><!-- End .rating-container -->
 
                                     <div class="product-price">
@@ -199,12 +197,12 @@
  
                                         </div>
 
-                                        <% if(product.Stoke===0){ %>
+                                        <% if(product.Stoke<=1){ %>
 
                                             <div class="product-price" >
                                                 <h6 style="text-decoration: line-through;color: red;" > Out of stock </h6>
                                              </div>
-                                             <% } else if(product.Stoke<5 && product.Stoke >0) { %>
+                                             <% } else if(product.Stoke<5 && product.Stoke >1) { %>
                                                 <div class="product-price" >
                                                     <h6 style="color: rgb(212, 125, 2);" >!! Only few left !!</h6>
                                                  </div>
@@ -224,7 +222,7 @@
                                         <a href="/addtocarthome/<%= product._id %>" class="btn-product btn-cart"><span>Add to Cart</span></a>
 
                                         <div class="details-action-wrapper">
-                                            <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                                            <a href="/addwish?id=<%= product._id %>" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
                                             <!-- <a href="#" class="btn-product btn-compare" title="Cart"><span>Add to Cart</span></a> -->
                                         </div><!-- End .details-action-wrapper -->
                                     </div><!-- End .product-details-action -->
@@ -232,15 +230,15 @@
                                     <div class="product-details-footer">
                                         <div class="product-cat">
                                             <span>Category:</span>
-                                            <%= product.Category %>
+                                            <%= product.Category.catagory %>
                                         </div><!-- End .product-cat -->
 
                                         <div class="social-icons social-icons-sm">
                                             <span class="social-label">Share:</span>
-                                            <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
-                                            <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
-                                            <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
-                                            <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+                                            <a href="" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                                            <a href="" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                                            <a href="" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+                                            <a href="" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
                                         </div>
                                     </div><!-- End .product-details-footer -->
                                 </div><!-- End .product-details -->
@@ -261,9 +259,7 @@
                             <li class="nav-item">
                                 <a class="nav-link" id="product-shipping-link" data-toggle="tab" href="#product-shipping-tab" role="tab" aria-controls="product-shipping-tab" aria-selected="false">Shipping & Returns</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="product-review-link" data-toggle="tab" href="#product-review-tab" role="tab" aria-controls="product-review-tab" aria-selected="false">Reviews (2)</a>
-                            </li>
+                            
                         </ul>
                     </div><!-- End .container -->
 
@@ -273,20 +269,9 @@
                             <div class="product-desc-content">
                                 <div class="container">
                                     <h3>Information</h3>
-                                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna viverra non, semper suscipit, posuere a, pede. Donec nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci. </p>
+                                    <p><%= product.Description%></p>
 
-                                    <h3>Fabric & care</h3>
-                                    <ul>
-                                        <li>Faux suede fabric</li>
-                                        <li>Gold tone metal hoop handles.</li>
-                                        <li>RI branding</li>
-                                        <li>Snake print trim interior </li>
-                                        <li>Adjustable cross body strap</li>
-                                        <li> Height: 31cm; Width: 32cm; Depth: 12cm; Handle Drop: 61cm</li>
-                                    </ul>
-
-                                    <h3>Size</h3>
-                                    <p>one size</p>
+                                    
                                 </div><!-- End .container -->
                             </div><!-- End .product-desc-content -->
                         </div><!-- .End .tab-pane -->
@@ -299,64 +284,7 @@
                                 </div><!-- End .container -->
                             </div><!-- End .product-desc-content -->
                         </div><!-- .End .tab-pane -->
-                        <div class="tab-pane fade" id="product-review-tab" role="tabpanel" aria-labelledby="product-review-link">
-                            <div class="reviews">
-                                <div class="container">
-                                    <h3>Reviews (2)</h3>
-                                    <div class="review">
-                                        <div class="row no-gutters">
-                                            <div class="col-auto">
-                                                <h4><a href="#">Samanta J.</a></h4>
-                                                <div class="ratings-container">
-                                                    <div class="ratings">
-                                                        <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
-                                                    </div><!-- End .ratings -->
-                                                </div><!-- End .rating-container -->
-                                                <span class="review-date">6 days ago</span>
-                                            </div><!-- End .col -->
-                                            <div class="col">
-                                                <h4>Good, perfect size</h4>
-
-                                                <div class="review-content">
-                                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus cum dolores assumenda asperiores facilis porro reprehenderit animi culpa atque blanditiis commodi perspiciatis doloremque, possimus, explicabo, autem fugit beatae quae voluptas!</p>
-                                                </div><!-- End .review-content -->
-
-                                                <div class="review-action">
-                                                    <a href="#"><i class="icon-thumbs-up"></i>Helpful (2)</a>
-                                                    <a href="#"><i class="icon-thumbs-down"></i>Unhelpful (0)</a>
-                                                </div><!-- End .review-action -->
-                                            </div><!-- End .col-auto -->
-                                        </div><!-- End .row -->
-                                    </div><!-- End .review -->
-
-                                    <div class="review">
-                                        <div class="row no-gutters">
-                                            <div class="col-auto">
-                                                <h4><a href="#">John Doe</a></h4>
-                                                <div class="ratings-container">
-                                                    <div class="ratings">
-                                                        <div class="ratings-val" style="width: 100%;"></div><!-- End .ratings-val -->
-                                                    </div><!-- End .ratings -->
-                                                </div><!-- End .rating-container -->
-                                                <span class="review-date">5 days ago</span>
-                                            </div><!-- End .col -->
-                                            <div class="col">
-                                                <h4>Very good</h4>
-
-                                                <div class="review-content">
-                                                    <p>Sed, molestias, tempore? Ex dolor esse iure hic veniam laborum blanditiis laudantium iste amet. Cum non voluptate eos enim, ab cumque nam, modi, quas iure illum repellendus, blanditiis perspiciatis beatae!</p>
-                                                </div><!-- End .review-content -->
-
-                                                <div class="review-action">
-                                                    <a href="#"><i class="icon-thumbs-up"></i>Helpful (0)</a>
-                                                    <a href="#"><i class="icon-thumbs-down"></i>Unhelpful (0)</a>
-                                                </div><!-- End .review-action -->
-                                            </div><!-- End .col-auto -->
-                                        </div><!-- End .row -->
-                                    </div><!-- End .review -->
-                                </div><!-- End .container -->
-                            </div><!-- End .reviews -->
-                        </div><!-- .End .tab-pane -->
+                        
                     </div><!-- End .tab-content -->
                 </div><!-- End .product-details-tab -->
 
@@ -400,36 +328,29 @@
                                 </a>
 
                                 <div class="product-action-vertical">
-                                    <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                    <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                                    <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
+                                    <a href="/addwish?id=<%= otherproducts[i]._id %>" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                                    
                                 </div><!-- End .product-action-vertical -->
 
                                 <div class="product-action">
-                                    <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                                    <a href="/addtocarthome/<%= otherproducts[i]._id %>" class="btn-product btn-cart"><span>add to cart</span></a>
                                 </div><!-- End .product-action -->
                             </figure><!-- End .product-media -->
 
                             <div class="product-body">
                                 <div class="product-cat">
-                                    <a href="#"><%= otherproducts[i].Category %></a>
+                                    <a href=""><%= otherproducts[i].Category.catagory %></a>
                                 </div><!-- End .product-cat -->
-                                <h3 class="product-title"><a href="product.html"> <%= otherproducts[i].Productname %> </a></h3><!-- End .product-title -->
+                                <h3 class="product-title"><a href="/productdetials/<%= otherproducts[i]._id %>"> <%= otherproducts[i].Productname %> </a></h3><!-- End .product-title -->
                                 <div class="product-price">
-                                    ₹ <%= otherproducts[i].Price %>
+                                    ₹ <%= otherproducts[i].Price-otherproducts[i].Discount %>
                                 </div><!-- End .product-price -->
                                 <div class="ratings-container">
-                                    <div class="ratings">
-                                        <div class="ratings-val" style="width: 20%;"></div><!-- End .ratings-val -->
-                                    </div><!-- End .ratings -->
-                                    <span class="ratings-text">( 2 Reviews )</span>
+                                   <!-- End .ratings -->
+                                   
                                 </div><!-- End .rating-container -->
 
-                                <div class="product-nav product-nav-dots">
-                                    <a href="#" class="active" style="background: #cc9966;"><span class="sr-only">Color name</span></a>
-                                    <a href="#" style="background: #7fc5ed;"><span class="sr-only">Color name</span></a>
-                                    <a href="#" style="background: #e8c97a;"><span class="sr-only">Color name</span></a>
-                                </div><!-- End .product-nav -->
+                               
                             </div><!-- End .product-body -->
                         </div><!-- End .product -->
                         <% } %>
@@ -458,80 +379,7 @@
             </div><!-- End .page-content -->
         </main><!-- End .main -->
 
-        <footer class="footer">
-        	<div class="footer-middle">
-	            <div class="container">
-	            	<div class="row">
-	            		<div class="col-sm-6 col-lg-3">
-	            			<div class="widget widget-about">
-	            				<img src="/assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105" height="25">
-	            				<p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. </p>
-
-	            				<div class="social-icons">
-	            					<a href="#" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
-	            					<a href="#" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
-	            					<a href="#" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
-	            					<a href="#" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
-	            					<a href="#" class="social-icon" target="_blank" title="Pinterest"><i class="icon-pinterest"></i></a>
-	            				</div><!-- End .soial-icons -->
-	            			</div><!-- End .widget about-widget -->
-	            		</div><!-- End .col-sm-6 col-lg-3 -->
-
-	            		<div class="col-sm-6 col-lg-3">
-	            			<div class="widget">
-	            				<h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
-
-	            				<ul class="widget-list">
-	            					<li><a href="about.html">About Molla</a></li>
-	            					<li><a href="#">How to shop on Molla</a></li>
-	            					<li><a href="#">FAQ</a></li>
-	            					<li><a href="contact.html">Contact us</a></li>
-	            					<li><a href="login.html">Log in</a></li>
-	            				</ul><!-- End .widget-list -->
-	            			</div><!-- End .widget -->
-	            		</div><!-- End .col-sm-6 col-lg-3 -->
-
-	            		<div class="col-sm-6 col-lg-3">
-	            			<div class="widget">
-	            				<h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
-
-	            				<ul class="widget-list">
-	            					<li><a href="#">Payment Methods</a></li>
-	            					<li><a href="#">Money-back guarantee!</a></li>
-	            					<li><a href="#">Returns</a></li>
-	            					<li><a href="#">Shipping</a></li>
-	            					<li><a href="#">Terms and conditions</a></li>
-	            					<li><a href="#">Privacy Policy</a></li>
-	            				</ul><!-- End .widget-list -->
-	            			</div><!-- End .widget -->
-	            		</div><!-- End .col-sm-6 col-lg-3 -->
-
-	            		<div class="col-sm-6 col-lg-3">
-	            			<div class="widget">
-	            				<h4 class="widget-title">My Account</h4><!-- End .widget-title -->
-
-	            				<ul class="widget-list">
-	            					<li><a href="#">Sign In</a></li>
-	            					<li><a href="cart.html">View Cart</a></li>
-	            					<li><a href="#">My Wishlist</a></li>
-	            					<li><a href="#">Track My Order</a></li>
-	            					<li><a href="#">Help</a></li>
-	            				</ul><!-- End .widget-list -->
-	            			</div><!-- End .widget -->
-	            		</div><!-- End .col-sm-6 col-lg-3 -->
-	            	</div><!-- End .row -->
-	            </div><!-- End .container -->
-	        </div><!-- End .footer-middle -->
-
-	        <div class="footer-bottom">
-	        	<div class="container">
-	        		<p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p><!-- End .footer-copyright -->
-	        		<figure class="footer-payments">
-	        			<img src="/assets/images/payments.png" alt="Payment methods" width="272" height="20">
-	        		</figure><!-- End .footer-payments -->
-	        	</div><!-- End .container -->
-	        </div><!-- End .footer-bottom -->
-        </footer><!-- End .footer -->
+        
     </div><!-- End .page-wrapper -->
     <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
 

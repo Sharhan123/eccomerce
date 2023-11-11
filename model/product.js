@@ -6,7 +6,7 @@ const ProductsSchema = new Schema({
   Description: { type: String, required: true },
   Productname: { type: String, required: true },
   Spec: { type: String, required: true },
-  Dateadded: { type: Date, required: true },
+  Created: { type: Date, required: true },
   Category: { type: Schema.Types.ObjectId, ref: 'catagory',required: true },
   Price: { type: Number, required: true },
   Discount: { type: Number },

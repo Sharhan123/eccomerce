@@ -2,6 +2,7 @@
 <div class="all container-fluid">
   
   <div class="frm">
+    <h6  style="color: white; text-align: center; " id="timer"></h6>
   <form action="/verify" method="post" class="form-m" >
     <h2 class="cls">Otp Verification</h2>
     <div class="mb-3">
@@ -21,11 +22,49 @@
   </form>
   <div class="me mt-2">
   <form action="/resendVerification/<%= cookies.email %>" method="post" >
-    <button type="submit" class="btn btn-dark mt-2">Resend Verification Code</button>
+    <button type="submit" id="resend" class="btn btn-dark mt-2" style="display: none;" onclick="startTimer()">Resend Verification Code</button>
   </form>
 </div>
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" crossorigin="anonymous"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Call startTimer when the page loads
+    startTimer();
+
+    function startTimer() {
+      var duration = 60;
+      var timerElement = document.querySelector('#timer');
+      var otpInput = document.querySelector('#resend');
+      
+      // Display the timer element
+      timerElement.style.display = 'block';
+
+      // Set the timer
+      var timer = setInterval(function () {
+        duration--;
+
+        // Update the timer display
+        timerElement.textContent = 'Time remaining: ' + duration + ' seconds';
+
+        if (duration <= 0) {
+          // Time is up, hide the timer and show the OTP input box
+          clearInterval(timer);
+          timerElement.style.display = 'none';
+          otpInput.style.display = 'block';
+        }
+      }, 1000);
+    }
+  });
+</script>
+
 <%- include('footer.ejs') %>
+
+
+
+
+
+
+

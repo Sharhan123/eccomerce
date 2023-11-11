@@ -46,12 +46,12 @@ console.log(err);
 const getwish= async (req, res, next) => {
 try{
 
-const product = await wishlist.findOne({Userid:req.cookies.user.id});
+const product = await wishlist.findOne({Userid:req.cookies.user.id})
 if(product){
 
     const productids= product.Products
     console.log(productids);
-    const wish = await products.find({_id:{$in:productids}})
+    const wish = await products.find({_id:{$in:productids}}).populate('Category')
     console.log(wish);
     res.render('user/wishlist',{wish})
 }else{

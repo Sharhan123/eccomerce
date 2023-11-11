@@ -29,7 +29,7 @@ app.use('/', userRouter);
 // app.use('/admin', usersRouter);
 
 app.use('/getadmin',adminrouter)
-mongoose.connect('mongodb+srv://sharhanmohammed03:Rapid7711@cluster.8vewkk6.mongodb.net/electromania?retryWrites=true&w=majority').then(()=>console.log("connection successfull"));
+mongoose.connect('mongodb+srv://sharhanmohammed03:Rapid7711@cluster.8vewkk6.mongodb.net/electromania?retryWrites=true&w=majority').then(()=>console.log("connection successfull")).catch((err)=>console.log(err))
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

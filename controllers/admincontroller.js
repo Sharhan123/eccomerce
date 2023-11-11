@@ -7,7 +7,6 @@ const Product = require("../model/product");
 const adata = require("../model/admin");
 const fs = require("fs");
 const path = require("path");
-const sharp = require("sharp")
 const catagory = require("../model/catagory");
 const coupons = require('../model/coupon')
 const Orders = require("../model/orders");
@@ -35,7 +34,7 @@ const getadmin = async function (req, res) {
     try {
   
   
-      let pro = await Product.find().sort({soldcount:-1}).limit(8)
+      let pro = await Product.find().sort({soldcount:-1}).limit(8).populate('Category')
       let data = await Orders.find({ Status: 'delivered' })
       let count = await Orders.countDocuments({ Status: 'delivered' })
       let acount = await Orders.countDocuments({ Status: 'active' })
@@ -102,12 +101,17 @@ res.redirect('/')
 
   const getproducts = async function (req, res) {
     try{
+      const category= await catagory.find({})
+    if(category.length > 0){
 
     
       const product = await Product.find({}).populate('Category')
       
     const catagry = await catagory.find({})
     res.render("admn/products", { product, pid: product._id, catagory: catagry })
+    }else{
+      res.redirect('/getadmin/cata?error=add category first to add product')
+    }
   } catch(err){
     console.log("error");
     console.log(err);
@@ -116,10 +120,15 @@ res.redirect('/')
 
 
   const addproduct = async function (req, res) {
-    const uploadedImages = req.files;
-    const imagePaths = [];
+    
   
     try {
+
+      
+
+      
+      const uploadedImages = req.files;
+    const imagePaths = [];
       for (const image of uploadedImages) {
         // Move the uploaded image to the "uploads" folder
         const imagePath = `/uploads/${image.originalname}`;
@@ -140,7 +149,7 @@ res.redirect('/')
         Shipingcost: req.body.scost,
         Stoke: req.body.stoke,
         Imagepath: imagePaths,
-        Dateadded: Date.now(),
+        Created: Date.now(),
       });
   
       await newProduct.save().then((data) => {
@@ -407,16 +416,35 @@ res.redirect('/')
 
 
   const getcoupon= async (req, res) => {
+    try{
 
-    const coupon= await coupons.find({})
-    res.render('admn/coupon',{coupon})
+      let error=""
+      const coupon= await coupons.find({})
+      if(req.query.error){
+        
+        error=req.query.error
+        
+      }
+      console.log(error);
+      res.render('admn/coupon',{coupon ,error})
+    }catch(err){
+      console.log(err);
+    }
+
+   
   }
 
 
   const addcoupon = async (req, res) => {
+try{
+
 
     const {code,adate,edate,amount,discount,limit}=req.body
-    const newcat = new coupon({
+    const exist = await coupon.find({couponcode:code})
+    if(exist){
+      res.redirect('/getadmin/coupon?error=coupon already exist')
+    }else{
+      const newcat = new coupon({
       couponcode:code,
       activationdate:adate,
       expirydate:edate,
@@ -428,6 +456,11 @@ res.redirect('/')
     await newcat.save()
     
     res.redirect('/getadmin/coupon')
+    }
+    
+  } catch (err){
+    console.log(err);
+  }
   }
 
 
@@ -443,7 +476,7 @@ res.redirect('/')
       res.redirect('/getadmin/coupon')
 
     } catch(err){
-
+      console.log(err);
     }
   }
 

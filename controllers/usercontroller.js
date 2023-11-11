@@ -8,17 +8,16 @@ const products = require('../model/product');
 const cartModel = require('../model/cart');
 const Orders = require('../model/orders');
 const catagory = require('../model/catagory')
-const helper = require('../helpers/paymenthelper')
 const Razorpay = require('razorpay');
-const crypto = require('crypto');
+
 const wishlistmodel = require('../model/whishlist') 
 
 const { errorMonitor } = require('nodemailer/lib/xoauth2');
 const ban = require('../model/banner');
 
 var instance = new Razorpay({
-  key_id: 'rzp_test_f0CUyOMdkz5Ems',
-  key_secret: 'jVlliMIYj9LGEaoxylbCt0j1',
+  key_id: process.env.RAZORKEY,
+  key_secret: process.env.RAZORSECRET,
 });
 
 
@@ -34,7 +33,7 @@ var transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "sharhanmohammed03@gmail.com",
+    user: process.env.EMAIL,
     pass: process.env.SECRET_KEY,
   },
 })
@@ -72,23 +71,40 @@ const getsignup = async function (req, res) {
 
 const postsignup = async function (req, res) {
   try {
+    const Referalcode = Math.floor(100000 + Math.random() * 900000);
     const verificationCode = Math.floor(100000 + Math.random() * 900000);
 
-    userdatacopy.findOne({ email: req.body.email }).then(async (data) => {
+    await userdatacopy.findOne({ email: req.body.email }).then(async (data) => {
       console.log(data);
       if (data) {
 
         res.render('user/signup', { error: "!!User is already exists!!" })
       } else {
         if (req.body.cpswd === req.body.pswd) {
-
+          if(req.body.refcode){
+             await userdatacopy.updateOne(
+              { Referalcode: req.body.refcode },
+              {
+                $inc: { Wallet: +100 }, // Increment Wallet by 100
+                $push: {
+                  WalletHistory: {
+                    Date: new Date(),
+                    Amount: 100,
+                    Description: 'Referral Bonus',
+                    Status: 'Credited'
+                  }
+                }
+              }
+            );
+          }
           const bpassword = await bycrypt.hash(req.body.pswd, 10)
           var newUser = new userdatacopy({
             username: req.body.uname,
             email: req.body.email,
             password: bpassword,
             verify: verificationCode,
-            Blocked: false
+            Blocked: false,
+            Referalcode:Referalcode
           })
           newUser.save().then((data) => {
             console.log("data saved");
@@ -98,6 +114,7 @@ const postsignup = async function (req, res) {
               email: data.email,
 
             };
+            
             res.cookie("user", cdata, { maxAge: 3600000, httpOnly: true });
             const mailOptions = {
               from: "sharhanmohammed03@gmail.com",
@@ -438,7 +455,7 @@ const getshop = async function (req, res, next) {
   let min = req.query.min || 0
   let max = req.query.max || 9999999999999999
   let price = req.query.price
-  console.log(price);
+  
   if (categories) {
     // If multiple categories are passed, split them into an array
     let categoryArray = categories.split(',');
@@ -460,7 +477,7 @@ const cname = await catagory.findOne({catagory:name})
       const productsPerPage = 6;
       const count = await products.countDocuments({ Category: name })
       const skip = (page - 1) * productsPerPage;
-      const product = await products.find({ Category: name, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage).sort({ Price: 1 })
+      const product = await products.find({ Category: name, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage).sort({ Price: 1 }).populate('Category')
       const totalpages = Math.ceil(count / productsPerPage)
 
       if (req.cookies.user) {
@@ -497,7 +514,7 @@ const cname = await catagory.findOne({catagory:name})
       const productsPerPage = 6;
       const count = await products.countDocuments({ Category: name })
       const skip = (page - 1) * productsPerPage;
-      const product = await products.find({ Category: name, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage)
+      const product = await products.find({ Category: name, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage).populate('Category')
       const totalpages = Math.ceil(count / productsPerPage)
 
       if (req.cookies.user) {
@@ -542,7 +559,7 @@ const cname = await catagory.findOne({catagory:name})
       const productsPerPage = 6;
       const count = await products.countDocuments({ Category: catagry })
       const skip = (page - 1) * productsPerPage;
-      const product = await products.find({ Category: catagry, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage).sort({ Price: 1 })
+      const product = await products.find({ Category: catagry, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage).sort({ Price: 1 }).populate('Category')
       const totalpages = Math.ceil(count / productsPerPage)
 
       if (req.cookies.user) {
@@ -585,7 +602,7 @@ const cname = await catagory.findOne({catagory:name})
       const productsPerPage = 6;
       const count = await products.countDocuments({ Category: catagry })
       const skip = (page - 1) * productsPerPage;
-      const product = await products.find({ Category: catagry, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage)
+      const product = await products.find({ Category: catagry, Price: { $gt: min, $lt: max } }).skip(skip).limit(productsPerPage).populate('Category')
       const totalpages = Math.ceil(count / productsPerPage)
 
       if (req.cookies.user) {
@@ -631,9 +648,9 @@ const cname = await catagory.findOne({catagory:name})
       const count = await products.countDocuments({
         $or: [
           { Productname: regex }, // Match product name
-          { Category: regex },    // Match product category
+            // Match product category
         ]
-      })
+      }).populate('Category')
       // Calculate the number of products to skip based on the current page
       const skip = (page - 1) * productsPerPage;
 
@@ -641,12 +658,12 @@ const cname = await catagory.findOne({catagory:name})
       const product = await products.find({
         $or: [
           { Productname: regex }, // Match product name
-          { Category: regex },    // Match product category
+              // Match product category
         ], Price: { $gt: min, $lt: max }
       })
         .skip(skip)
         .limit(productsPerPage)
-        .sort({ Price: 1 });
+        .sort({ Price: 1 }).populate('Category')
       const totalpages = Math.ceil(count / productsPerPage)
 
 
@@ -691,9 +708,10 @@ const cname = await catagory.findOne({catagory:name})
       const count = await products.countDocuments({
         $or: [
           { Productname: regex }, // Match product name
-          { Category: regex },    // Match product category
+              // Match product category
         ]
-      })
+      }).populate('Category')
+      
       // Calculate the number of products to skip based on the current page
       const skip = (page - 1) * productsPerPage;
 
@@ -701,11 +719,12 @@ const cname = await catagory.findOne({catagory:name})
       const product = await products.find({
         $or: [
           { Productname: regex }, // Match product name
-          { Category: regex },    // Match product category
+             // Match product category
         ], Price: { $gt: min, $lt: max }
       })
         .skip(skip)
-        .limit(productsPerPage);
+        .limit(productsPerPage).populate('Category')
+        console.log(product);
       const totalpages = Math.ceil(count / productsPerPage)
 
 
@@ -755,7 +774,7 @@ const cname = await catagory.findOne({catagory:name})
       const product = await products.find({ Price: { $gt: min, $lt: max } })
         .skip(skip)
         .limit(productsPerPage)
-        .sort({ Price: 1 });
+        .sort({ Price: 1 }).populate('Category')
       const totalpages = Math.ceil(count / productsPerPage)
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });
@@ -803,7 +822,7 @@ const cname = await catagory.findOne({catagory:name})
       // Query the database to get the products for the current page
       const product = await products.find({ Price: { $gt: min, $lt: max } })
         .skip(skip)
-        .limit(productsPerPage);
+        .limit(productsPerPage).populate('Category')
       const totalpages = Math.ceil(count / productsPerPage)
       if (req.cookies.user) {
         let cart = await cartModel.findOne({ Userid: req.cookies.user.id });

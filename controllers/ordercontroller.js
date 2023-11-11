@@ -12,16 +12,16 @@ const helper = require('../helpers/paymenthelper')
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const Coupon = require('../model/coupon')
-
+require('dotenv').config()
 
 const { errorMonitor } = require('nodemailer/lib/xoauth2');
 const ban = require('../model/banner');
 const { isValidObjectId } = require('mongoose');
 
 var instance = new Razorpay({
-    key_id: 'rzp_test_f0CUyOMdkz5Ems',
-    key_secret: 'jVlliMIYj9LGEaoxylbCt0j1',
-});
+    key_id: process.env.RAZORKEY,
+    key_secret: process.env.RAZORSECRET,
+  });
 
 
 const getorder = async function(req, res, next) {

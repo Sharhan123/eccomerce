@@ -1,3 +1,4 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <%- include('head.ejs') %>
 <nav class="navbar p-0 fixed-top d-flex flex-row">
   <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
@@ -81,7 +82,7 @@
               <tr>
                 <th> Image </th>
                 <th> First name </th>
-                
+                <th> Category </th>
                 <th> Amount </th>
                 <th> Stock </th>
                 <th> Actions </th>
@@ -103,8 +104,7 @@
                   <% }else { %>
                 <td style="color: rgb(15, 43, 255);"> <%= item.Stoke %> </td>
                 <% } %>
-                <td> <a  class="btn btn-danger delete-button"
-                  onclick="showDeleteConfirmation(event,'<%= item._id %>')">Delete</a> </td>
+                
                 <td> <button class="btn btn-primary openEditBtn" onclick="editClick({
                     pid:`<%= item._id %>`,
                     pname:`<%= item.Productname %>`,
@@ -135,7 +135,7 @@
   <div class="formDiv">
       <h6 class="text-center">Edit the product  </h6>
       <br>
-      <p class="error" style="text-align: center; color: red;"> </p>
+      
 
 
       <form  method="post" onsubmit="editproduct()"  id="theEditForm" enctype="multipart/form-data">
@@ -143,6 +143,8 @@
               <label class="form-label">Product Name</label>
               <input type="text" class="form-control" name="pname" id="pname" value="" minlength="5" maxlength="50" required>
           </div>
+          <p class="aerror" style=" color: red;"> </p>
+
           <div class="mb-3">
               <label class="form-label">Category</label>
               <input type="text" class="form-control" name="category" id="category" value="" required>
@@ -159,6 +161,8 @@
               <label class="form-label">Price</label>
               <input type="number" name="price" id="price" class="form-control" value="" min="100" required>
           </div>
+          <p class="perror" style=" color: red;"> </p>
+
           <div class="mb-3">
               <label class="form-label">Shipping cost</label>
               <input type="number" name="scost" id="scost" class="form-control" value="" min="1" required>
@@ -167,6 +171,8 @@
               <label class="form-label">Discount amount</label>
               <input type="number" name="discount" id="discount" class="form-control" value="" min="1" required>
           </div>
+          <p class="derror" style=" color: red;"> </p>
+
           <div class="mb-3">
               <label class="form-label">Total stoke</label>
               <input type="number" name="stoke" id="stoke" class="form-control " value="" min="1" required>
@@ -175,7 +181,7 @@
               <label class="form-label">Select the images</label>
               <input type="file" class="form-control" id="editfileUpload" name="images" value="" multiple>
           </div>
-          <div id="editImagePreview"></div>
+          <div id="editImagePreview" ></div>
           <button type="submit" class="btn btn-primary">Edit product</button>
       </form>
       
@@ -188,12 +194,13 @@
     <div class="formDiv">
         <h6 class="text-center">Add new product</h6>
         <br>
-        <p class="aerror" style="text-align: center; color: red;"> </p>
+        
         <form action="/getadmin/addproduct" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label">Product Name</label>
-                <input type="text" class="form-control" name="pname" value="" required maxlength="50" minlength="5"> 
+                <input type="text" id="apname" class="form-control" name="pname" value="" required maxlength="50" minlength="5"> 
             </div>
+            <p class="error" style=" color: red;"> </p>
             <div class="mb-3">
                 <label class="form-label">Category</label>
                 <select class="form-label form-control" name="category">
@@ -208,20 +215,24 @@
             </div>
             <div class="form-floating mb-3">
                 <textarea class="form-control" name="desc"   placeholder="Leave a comment here"
-                    id="floatingTextarea"  ></textarea>
+                    id="floatingTextarea" required ></textarea>
                 <label for="floatingTextarea">Description</label>
             </div>
             <div class="mb-3">
                 <label class="form-label">Price</label>
-                <input type="number" id="price" name="price" class="form-control" value="" required min="100">
+                <input type="number" id="aprice" name="price" class="form-control" value="" required min="100">
             </div>
+            <p class="errorp" style=" color: red;"> </p>
+
             <div class="mb-3">
                 <label class="form-label">Shipping cost</label>
                 <input type="number" name="scost" class="form-control" required>
             <div class="mb-3">
                 <label class="form-label">Discount amount</label>
-                <input type="number" name="discount" id="discount" class="form-control" value="" required min="1" >
+                <input type="number" name="discount" id="adiscount" class="form-control" value="" required min="1" >
             </div>
+            <p class="errord" style=" color: red;"> </p>
+
             <div class="mb-3">
                 <label class="form-label">Total stock</label>
                 <input type="number" name="stoke" class="form-control" value="" required min="1">
@@ -230,7 +241,7 @@
                 <label class="form-label">Select the images</label>
                 <input type="file" class="form-control" id="fileUpload" name="images" value="" multiple required>
             </div>
-            <div id="imagePreview" style="max-width: 50px;"></div>
+            <div id="imagePreview" style="object-fit: contain; max-width: 20px;"></div>
             <button type="submit" class="btn btn-primary">Add product</button>
         </form>
     </div>
@@ -243,11 +254,11 @@
 
 
 
-
-
-
-
 <%- include('foot.ejs') %>
+
+
+
+
 <script>
   // Add an event listener to the "Discount amount" input field
   const discountInput = document.getElementById("discount");
@@ -278,7 +289,7 @@
         document.getElementById('discount').value = item.discount;
         document.getElementById('stoke').value = item.stoke;
 
-        const imgs = product.images.split(',');
+        const imgs = item.images.split(',');
 
         document.getElementById('editImagePreview').innerHTML = '';
         imgs.forEach(function (imageSrc, index) {
@@ -332,6 +343,8 @@
                 img.className = 'preview-image';
                 img.src = URL.createObjectURL(file);
                 img.setAttribute('data-index', i);
+                img.className = 'm-1';
+                img.style.maxWidth = '80px';
 
                 img.addEventListener('click', (event) => {
                     const index = parseInt(event.target.getAttribute('data-index'));
@@ -381,6 +394,8 @@
                 img.className = 'preview-image';
                 img.src = URL.createObjectURL(file);
                 imagePreview2.appendChild(img);
+                img.className = 'm-1';
+                img.style.maxWidth = '80px';
             }
         }
     });
@@ -431,11 +446,11 @@
             // Loop through all product rows and hide those that don't match the search term
             productRows.forEach((row) => {
                 const productName = row.querySelector('#product-name').textContent.toLowerCase();
-                const productCategory = row.querySelector('#product-category').textContent.toLowerCase();
+                
 
                 if (
-                    productName.includes(searchTerm) ||
-                    productCategory.includes(searchTerm)
+                    productName.includes(searchTerm) 
+                   
                 ) {
                     row.style.display = 'table-row';
                 } else {
@@ -449,11 +464,11 @@
 
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
+  document.addEventListener("DOMContentLoaded", function () {
       // Get a reference to the Product Name input field
-      var productNameInput = document.querySelector('input[name="pname"]');
-      var price = document.querySelector('input[name="price"]')
-      var discount = document.querySelector('input[name="discount"]')
+      var productNameInput = document.querySelector('input[id="apname"]');
+      var price = document.querySelector('input[id="aprice"]')
+      var discount = document.querySelector('input[id="adiscount"]')
       // Keep track of the previously entered product names
       var previousNames = new Set();
       
@@ -465,32 +480,33 @@
       productNameInput.addEventListener("input", function(event) {
           var enteredName = productNameInput.value;
           document.querySelector('.error').textContent="";
+          document.getElementById('apname').style.borderColor='';
           // Check for character limit
           if (enteredName.length > maxCharacters) {
+            document.getElementById('apname').style.borderColor='red'
               document.querySelector('.error').textContent="Product Name is too long. Please keep it under " + maxCharacters + " characters."
               productNameInput.value = enteredName.slice(0, maxCharacters);
           }
           
           if (enteredName.length < minCharacters) {
+            document.getElementById('apname').style.borderColor='red'
             document.querySelector('.error').textContent="Product Name is too short. Please keep it Above " + minCharacters + " characters."
               productNameInput.value = enteredName.slice(0, minCharacters);
           }
 
           // Check for repeated names
-          if (previousNames.has(enteredName)) {
-            document.querySelector('.error').textContent="Product Name is already entered . Please keep it change "
-
-              productNameInput.value = "";
-          }
+          
       });
 
       price.addEventListener("input", function(event) {
           var enteredName = price.value;
-          document.querySelector('.error').textContent="";
+          document.querySelector('.errorp').textContent="";
+          document.getElementById('aprice').style.borderColor=''
           // Check for character limit
           if (enteredName < 100) {
-              document.querySelector('.error').textContent="Price  is too short. Please keep it above 100 " 
-              productNameInput.value = enteredName.slice(0, maxCharacters);
+            document.getElementById('aprice').style.borderColor='red'
+              document.querySelector('.errorp').textContent="Price  is too short. Please keep it above 100 " 
+              price.value = enteredName.slice(0, maxCharacters);
           }
           
           
@@ -499,13 +515,21 @@
 
       discount.addEventListener("input", function(event) {
           var enteredName = discount.value;
-          document.querySelector('.error').textContent="";
+          var enteredprice = price.value
+          document.querySelector('.errord').textContent="";
+          document.getElementById('adiscount').style.borderColor=''
           // Check for character limit
-          if (enteredName <= 1) {
-              document.querySelector('.error').textContent="Discount price entered is too short. Please keep it above 1 " 
-              productNameInput.value = enteredName.slice(0, maxCharacters);
+          if (enteredName <= 1 ) {
+            document.getElementById('adiscount').style.borderColor='red'
+              document.querySelector('.errord').textContent="Discount price entered is too short. Please keep it above 1 " 
+              discount.value = enteredName.slice(0, maxCharacters);
           }
           
+          if (enteredName >= enteredprice ) {
+            document.getElementById('adiscount').style.borderColor = 'red';
+              document.querySelector('.errord').textContent="Discount price entered is greaterthan price. Please keep it below  " + enteredprice 
+              discount.value = enteredName.slice(0, maxCharacters);
+          }
           
          
       });
@@ -534,19 +558,23 @@
       productNameInput.addEventListener("input", function(event) {
           var enteredName = productNameInput.value;
           document.querySelector('.aerror').textContent="";
+          document.getElementById('pname').style.borderColor = '';
           // Check for character limit
           if (enteredName.length > maxCharacters) {
+            document.getElementById('pname').style.borderColor = 'red';
               document.querySelector('.aerror').textContent="Product Name is too long. Please keep it under " + maxCharacters + " characters."
               productNameInput.value = enteredName.slice(0, maxCharacters);
           }
           
           if (enteredName.length < minCharacters) {
+            document.getElementById('pname').style.borderColor = 'red';
             document.querySelector('.aerror').textContent="Product Name is too short. Please keep it Above " + minCharacters + " characters."
               productNameInput.value = enteredName.slice(0, minCharacters);
           }
 
           // Check for repeated names
           if (previousNames.has(enteredName)) {
+            document.getElementById('pname').style.borderColor = 'red';
             document.querySelector('.aerror').textContent="Product Name is already entered . Please keep it change "
 
               productNameInput.value = "";
@@ -555,11 +583,13 @@
 
       price.addEventListener("input", function(event) {
           var enteredName = price.value;
-          document.querySelector('.aerror').textContent="";
+          document.querySelector('.perror').textContent="";
+          document.getElementById('price').style.borderColor = '';
           // Check for character limit
           if (enteredName < 100) {
-              document.querySelector('.aerror').textContent="Price  is too short. Please keep it above 100 " 
-              productNameInput.value = enteredName.slice(0, maxCharacters);
+            document.getElementById('price').style.borderColor = 'red';
+              document.querySelector('.perror').textContent="Price  is too short. Please keep it above 100 " 
+              price.value = enteredName.slice(0, maxCharacters);
           }
           
           
@@ -568,12 +598,22 @@
 
       discount.addEventListener("input", function(event) {
           var enteredName = discount.value;
-          document.querySelector('.aerror').textContent="";
+          var enteredprice = price.value
+          document.querySelector('.derror').textContent="";
+          document.getElementById('discount').style.borderColor = '';
           // Check for character limit
-          if (enteredName <= 1) {
-              document.querySelector('.aerror').textContent="Discount price entered is too short. Please keep it above 1 " 
-              productNameInput.value = enteredName.slice(0, maxCharacters);
+          if (enteredName <= 1 ) {
+            document.getElementById('discount').style.borderColor = 'red';
+              document.querySelector('.derror').textContent="Discount price entered is too short. Please keep it above 1 " 
+              discount.value = enteredName.slice(0, maxCharacters);
           }
+
+          if (enteredName >= enteredprice ) {
+            document.getElementById('discount').style.borderColor = 'red';
+              document.querySelector('.derror').textContent="Discount price entered is greaterthan price. Please keep it below  " + enteredprice 
+              discount.value = enteredName.slice(0, maxCharacters);
+          }
+
           
           
          
@@ -607,6 +647,7 @@ function showDeleteConfirmation(event, pid) {
   });
 }
 </script>
+
 
 
 

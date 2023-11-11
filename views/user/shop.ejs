@@ -34,7 +34,7 @@
                         <i class="icon-bars"></i>
                     </button>
 
-                    <a href="index.html" class="logo">
+                    <a href="" class="logo">
                         <img src="/images/Screenshot 2023-09-12 110622.png" alt="Molla Logo" width="140" height="40" style="margin-top:.5em ;">
                     </a>
 
@@ -226,7 +226,7 @@
                             </div><!-- End .toolbox-right -->
                         </div><!-- End .toolbox -->
 
-                <% if( product || product.length == 0 ){ %>
+                <% if( !product || product.length == 0 ){ %>
                     <h6>
                         No products available
                     </h6>
@@ -260,7 +260,7 @@
 
                                         <div class="product-body">
                                             <div class="product-cat">
-                                                <a href="/productdetials/<%= product[i]._id %>"><%= product[i].Category %></a>
+                                                <a href="/productdetials/<%= product[i]._id %>"><%= product[i].Category.catagory %></a>
                                             </div><!-- End .product-cat -->
                                             <h3 class="product-title"><a href="/productdetials/<%= product[i]._id %>"><%= product[i]. Productname %></a></h3><!-- End .product-title -->
                                             <div class="product-price">
@@ -527,22 +527,21 @@
             </div><!-- End .container -->
         </div><!-- End .page-content -->
     </main><!-- End .main -->
-
-    <footer class="footer">
+    <footer class="footer footer" style="color: black;">
         <div class="footer-middle">
             <div class="container">
                 <div class="row">
                     <div class="col-sm-6 col-lg-3">
                         <div class="widget widget-about">
-                            <img src="assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105" height="25">
-                            <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. </p>
+                            <img src="/images/Screenshot 2023-09-12 110622.png" class="footer-logo" alt="Footer Logo" width="105" height="25">
+                            <p style="color: black;">ELECTRO MANIA the perfect choice for digital world  </p>
 
                             <div class="social-icons">
-                                <a href="#" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
-                                <a href="#" class="social-icon" target="_blank" title="Pinterest"><i class="icon-pinterest"></i></a>
+                                <a href="https://www.instagram.com/mohd_sharhan_/#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                                <a href="https://www.instagram.com/mohd_sharhan_/#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                                <a href="https://www.instagram.com/mohd_sharhan_/#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+                                <a href="https://www.instagram.com/mohd_sharhan_/#" class="social-icon" title="Youtube" target="_blank"><i class="icon-youtube"></i></a>
+                                <a href="https://www.instagram.com/mohd_sharhan_/#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
                             </div><!-- End .soial-icons -->
                         </div><!-- End .widget about-widget -->
                     </div><!-- End .col-sm-6 col-lg-3 -->
@@ -574,18 +573,18 @@
                                 <li><a href="#">Privacy Policy</a></li>
                             </ul><!-- End .widget-list -->
                         </div><!-- End .widget -->
-                    </div><!-- End .col-sm-6 col-lg-3 -->
+                    </div>
 
                     <div class="col-sm-6 col-lg-3">
                         <div class="widget">
                             <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
 
                             <ul class="widget-list">
-                                <li><a href="#">Sign In</a></li>
-                                <li><a href="cart.html">View Cart</a></li>
-                                <li><a href="#">My Wishlist</a></li>
-                                <li><a href="#">Track My Order</a></li>
-                                <li><a href="#">Help</a></li>
+                                <li><a href="/sin">Sign In</a></li>
+                                <li><a href="/viewcart">View Cart</a></li>
+                                <li><a href="/wishlist">My Wishlist</a></li>
+                                <li><a href="/getorder">Track My Order</a></li>
+                                
                             </ul><!-- End .widget-list -->
                         </div><!-- End .widget -->
                     </div><!-- End .col-sm-6 col-lg-3 -->
@@ -595,13 +594,14 @@
 
         <div class="footer-bottom">
             <div class="container">
-                <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p><!-- End .footer-copyright -->
+                <p class="footer-copyright">Copyright © 2019 ELECTRO MANIA Store. All Rights Reserved.</p><!-- End .footer-copyright -->
                 <figure class="footer-payments">
                     <img src="assets/images/payments.png" alt="Payment methods" width="272" height="20">
                 </figure><!-- End .footer-payments -->
             </div><!-- End .container -->
         </div><!-- End .footer-bottom -->
     </footer><!-- End .footer -->
+   
 </div><!-- End .page-wrapper -->
 <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
 

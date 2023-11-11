@@ -8,9 +8,6 @@ const products = require('../model/product');
 const cartModel = require('../model/cart');
 const Orders = require('../model/orders');
 const catagory = require('../model/catagory')
-const helper = require('../helpers/paymenthelper')
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
 const Coupon = require('../model/coupon')
 
 
